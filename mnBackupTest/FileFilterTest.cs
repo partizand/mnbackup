@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using mnBackupLib;
 using NUnit.Framework;
+using System.IO;
 
 namespace mnBackupTest
 {
@@ -16,12 +17,35 @@ namespace mnBackupTest
         [Test]
         public void TestFilt()
         {
+            // Нужно создать файлы
+            /*
+            bool res;
+            res = Param.CreateTestDir();
+            Assert.AreEqual(res, true,"Каталог для тестов успешно создался");
+            if (!res) return;
+
             
+            res=Param.ClearTestDir();
+            Assert.AreEqual(res, true, "Каталог для тестов успешно очистился");
+            if (!res) return;
+
+            bool suc;
+            res = true;
+            suc=Param.CreateFileToTest("test.txt");
+            res = res & suc;
+            suc = Param.CreateFileToTest("test.log");
+            res = res & suc;
+            suc = Param.CreateFileToTest("test.zip");
+            res = res & suc;
+            suc = Param.CreateFileToTest("mtest.zip");
+            res = res & suc;
+            suc = Param.CreateFileToTest("test.7z");
+            res = res & suc;
+            Assert.AreEqual(res, true, "Файлы для тестов успешно создались");
+            */
             FileFilter ff = new FileFilter("*.txt", "");
 
             bool a;
-
-            
             
             a = ff.isIn("c:\\dir\\test.txt");
             Assert.AreEqual(a, true);

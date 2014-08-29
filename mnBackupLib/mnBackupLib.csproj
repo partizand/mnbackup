@@ -35,7 +35,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\!Libs\NLog\net35\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="SevenZipSharp, Version=0.64.3890.29348, Culture=neutral, PublicKeyToken=20de82c62b055c88, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\!Libs\SevenZipSharp\SevenZipSharp.dll</HintPath>

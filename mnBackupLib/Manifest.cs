@@ -38,21 +38,7 @@ namespace mnBackupLib
             //DiffLines=new List<BakEntryInfo>(Lines.FindAll(obj => obj.TypeBackup != TypeBackup.Full));
             Lines.Sort();
         }
-        /*
-        public Manifest(string DestDir)
-        {
-            ManifestFile = Path.Combine(DestDir, Backup.ManifestFile);
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<ManifestLine>));
-            Lines = new List<ManifestLine>();
-            if (File.Exists(ManifestFile))
-            {
-                FileStream fs = new FileStream(ManifestFile, FileMode.Open);
-                //List<Task> t=new 
-                Lines.AddRange((List<ManifestLine>)serializer.ReadObject(fs));
-                fs.Close();
-            }
-        }
-         */ 
+        
         /// <summary>
         /// Запись манифеста
         /// </summary>
