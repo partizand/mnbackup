@@ -13,42 +13,39 @@ namespace mnBackupLib
     /// <summary>
     /// Инофрмация об ошибке, статусе
     /// </summary>
-    public class StatusInfo
+    public class StatusInfo<T> where T : System.IComparable
     {
         
         /// <summary>
         /// Текущий статус
         /// </summary>
-        public StatusBackup Status
+        public T Status
         {
             get { return _status; }
         }
 
-        private StatusBackup _status;
+        private T _status;
 
 
-        /// <summary>
-        /// Инициализация значением ОК
-        /// </summary>
-        public StatusInfo()
-        {
-            _status = StatusBackup.OK;
-        }
+        
         /// <summary>
         /// Инициализация заданным значением
         /// </summary>
         /// <param name="status"></param>
-        public StatusInfo(StatusBackup status)
+        public StatusInfo(T status)
         {
             _status = status;
         }
         /// <summary>
-        /// Обновляет статус. Если новый статус хуже он становится текущим
+        /// Обновляет статус. Если новый статус хуже (больше) он становится текущим
         /// </summary>
         /// <param name="status"></param>
-        public void AddStatus(StatusBackup status)
+        public void AddStatus(T status)
         {
-            if (_status < status) _status = status;
+            //int i = status.ToInt32( ToInt32();
+
+            if (_status.CompareTo(status) < 0)
+                _status = status;
         }
 
     }

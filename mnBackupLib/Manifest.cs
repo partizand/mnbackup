@@ -13,13 +13,17 @@ namespace mnBackupLib
     public class Manifest
     {
         
-        //public List<ManifestLine> Lines;
-
+        
+        /// <summary>
+        /// Записи о бэкапах
+        /// </summary>
         List<BakEntryInfo> Lines;
-        //List<BakEntryInfo> DiffLines;
+        
 
 
-
+        /// <summary>
+        /// Имя файла с манифестом
+        /// </summary>
         string ManifestFile;
 
         public Manifest(string manifestFile)
@@ -59,29 +63,16 @@ namespace mnBackupLib
             }
         }
         /// <summary>
-        /// Добавить информацию об одном бэкапе
+        /// Добавить запись об одном копировании
         /// </summary>
-        /// <param name="dt"></param>
-        /// <param name="typeBackup"></param>
-        /// <param name="status"></param>
-        public void Add(DateTime dt, TypeBackup typeBackup, StatusBackup status,string backupFileName)
+        /// <param name="bakEntry"></param>
+        public void Add(BakEntryInfo bakEntry)
         {
-            
-            
-            Lines.Add(new BakEntryInfo(dt, status, backupFileName));
-            
-            //Lines.Add(new ManifestLine(dt,typeBackup,status,backupFileName));
+            Lines.Add(bakEntry);
+            Lines.Sort();
         }
-        /// <summary>
-        /// Добавить информацию об одном бэкапе с текущим временем
-        /// </summary>
-        /// <param name="typeBackup"></param>
-        /// <param name="status"></param>
-        public void Add(TypeBackup typeBackup, StatusBackup status,string backupFileName)
-        {
-            Add(DateTime.Now, typeBackup, status, backupFileName);
-        }
-
+        
+        
 
         /// <summary>
         /// Удалить информацию о копировании
@@ -129,17 +120,7 @@ namespace mnBackupLib
            
         }
         
-        /// <summary>
-        /// Возвращает инфу о копировании по дате
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        /*
-        private ManifestLine GetByDate2(DateTime dt)
-        {
-            return Lines.Find(obj => obj.BackupDate == dt);
-        }
-         */ 
+        
 
     }
 

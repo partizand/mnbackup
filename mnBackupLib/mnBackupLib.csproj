@@ -69,7 +69,6 @@
     <Compile Include="Manifest.cs" />
     <Compile Include="BakEntryInfo.cs" />
     <Compile Include="StatusInfo.cs" />
-    <Compile Include="TaskList.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

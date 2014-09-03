@@ -10,19 +10,15 @@ namespace mnBackupTest
     {
         static void Main(string[] args)
         {
-            bool ret;
-            //FileManage.DirectoryCreate(@"d:\temp\mnBackupTest");
-            ret=Param.CreateTestDir();
+            // Проверка чтения периода
+            Period per = new Period("2d");
             
-            Param.CreateFileToTest("test.txt");
+
+            per = new Period("week");
             
-            Param.CreateFileToTest("test.log");
+
+            per = new Period("3Month");
             
-            Param.CreateFileToTest("test.zip");
-            
-            Param.CreateFileToTest("mtest.zip");
-            
-            Param.CreateFileToTest("test.7z");
         }
     }
 }

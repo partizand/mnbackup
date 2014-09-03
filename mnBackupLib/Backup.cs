@@ -5,6 +5,8 @@ using System.Text;
 using NLog;
 using SevenZip;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace mnBackupLib
 {
@@ -22,28 +24,86 @@ namespace mnBackupLib
         /// <summary>
         /// Имя файла для информации о бэкапах
         /// </summary>
-        public const string ManifestFile="manifest";
+        //public const string ManifestFile="manifest";
 
-        public TaskList Tasks = new TaskList();
+        public List<Task> Tasks
+        {
+            get { return _tasks; }
+        }
+
+        private List<Task> _tasks = new List<Task>();
+
+        /// <summary>
+        /// Количество заданий
+        /// </summary>
+        public int Count
+        {
+            get { return _tasks.Count; }
+        }
 
         public Backup()
         {
             
         }
         /// <summary>
+        /// Добавить задание в список
+        /// </summary>
+        /// <param name="job"></param>
+        public void Add(Task job)
+        {
+            _tasks.Add(job);
+        }
+
+        /// <summary>
         /// Прочитать задания из файла. Задания добавляются к текущим
         /// </summary>
         /// <param name="FileName"></param>
         public void Read(string FileName)
         {
-            Tasks.Read(FileName);
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Task>));
+            if (File.Exists(FileName))
+            {
+                FileStream fs = new FileStream(FileName, FileMode.Open);
+                //List<Task> t=new 
+                _tasks.AddRange((List<Task>)serializer.ReadObject(fs));
+                fs.Close();
+            }
         }
+
+        /// <summary>
+        /// Записывает список заданий в файл (JSON)
+        /// </summary>
+        /// <param name="FileName"></param>
+        public void Save(string FileName)
+        {
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Task>));
+            try
+            {
+                FileStream fs = new FileStream(FileName, FileMode.Create);
+                serializer.WriteObject(fs, _tasks);
+                fs.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        /// <summary>
+        /// Очищает список заданий
+        /// </summary>
+        public void Clear()
+        {
+            _tasks.Clear();
+        }
+
         /// <summary>
         /// Запускает бэкап
         /// </summary>
         public void Start()
         {
-            foreach (Task job in Tasks.Tasks)
+
+            foreach (Task job in _tasks)
             {
                 StartTask(job);
             }
@@ -52,11 +112,14 @@ namespace mnBackupLib
         /// Обработка задания
         /// </summary>
         /// <param name="job"></param>
-        private StatusBackup StartTask(Task job)
+        public StatusBackup StartTask(Task job)
         {
             logger.Info("Запуск задания {0}", job.NameTask);
-            StatusInfo si = new StatusInfo();
-            StatusBackup sb = StatusBackup.OK;
+            StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
+            
+            //StatusInfo<bool> si2 = new StatusInfo<bool>(true);
+            
+            
             // Проверка существования каталогов
             if (!Directory.Exists(job.Source))
             {
@@ -66,9 +129,13 @@ namespace mnBackupLib
 
             if (!Directory.Exists(job.Destination))
             {
-                
-                logger.Error("Каталог приемника не существует {0}", job.Destination);
-                return StatusBackup.Fatal;
+
+                bool cr = FileManage.DirectoryCreate(job.Destination);
+                if (!cr)
+                {
+                    logger.Error("Каталог приемника не существует {0}", job.Destination);
+                    return StatusBackup.Fatal;
+                }
             }
 
 
@@ -98,17 +165,19 @@ namespace mnBackupLib
             }
 
             // Добавляем запись в манифест
-            manifest.Add(BakType, StatusBackup.OK, ArhName);
+            BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, ArhName);
+            manifest.Add(bakEntry);
             
             // Удаляем старые архивы
-            sb=DeleteOldArh(job, ref manifest);
+            //StatusBackup sb = StatusBackup.OK;
+            StatusBackup sb = DeleteOldArh(job, ref manifest);
             si.AddStatus(sb);
             
             manifest.Save();
 
 
 
-            return si.Status;
+            return (StatusBackup)si.Status;
         }
 
         /// <summary>
@@ -119,7 +188,7 @@ namespace mnBackupLib
         {
             // Какие архивы нужно удалить
             //StatusBackup st = StatusBackup.OK;
-            StatusInfo si = new StatusInfo();
+            StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
             BakEntryInfo[] baks = manifest.GetAllBeforePeriod(job.Plan.FullIntervalSave);
             if (baks == null) return si.Status;
             if (baks.Length == 0) return si.Status;

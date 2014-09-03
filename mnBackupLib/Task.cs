@@ -30,7 +30,7 @@ namespace mnBackupLib
         /// <returns></returns>
         public string GetManifestFile()
         {
-            string manifestFile = Path.Combine(Destination, Backup.ManifestFile+GetPrefix());
+            string manifestFile = Path.Combine(Destination, "manifest"+GetPrefix());
             return manifestFile;
         }
 

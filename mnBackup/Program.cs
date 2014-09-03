@@ -19,7 +19,7 @@ namespace mnBackup
             Task job = new Task("test","d:\\temp\\testmn\\source","d:\\temp\\testmn\\dest");
             //job.SourceFilter.IncludeFileMask = "*";
 
-            bak.Tasks.Tasks.Add(job);
+            bak.Add(job);
             
             bak.Start();
             

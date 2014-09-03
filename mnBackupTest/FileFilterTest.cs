@@ -43,14 +43,15 @@ namespace mnBackupTest
             res = res & suc;
             Assert.AreEqual(res, true, "Файлы для тестов успешно создались");
             */
-            FileFilter ff = new FileFilter("*.txt", "");
+            
+            // Включение файлов
+
+            FileFilter ff = new FileFilter("*.txt,*.zip", "");
 
             bool a;
             
             a = ff.isIn("c:\\dir\\test.txt");
             Assert.AreEqual(a, true);
-
-            
 
             a = ff.isIn("c:\\dir\\test.log");
             Assert.AreNotEqual(a, true);
@@ -59,11 +60,52 @@ namespace mnBackupTest
             Assert.AreEqual(a, true);
 
             a = ff.isIn("c:\\dir\\todo.zip");
+            Assert.AreEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\test.7z");
             Assert.AreNotEqual(a, true);
 
-            ff = new FileFilter();
+            // Исключение файлов
+            ff = new FileFilter("*", "*.txt,*.zip");
+
             a = ff.isIn("c:\\dir\\test.txt");
+            Assert.AreNotEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\test.log");
             Assert.AreEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\code.zip");
+            Assert.AreNotEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\todo.zip");
+            Assert.AreNotEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\test.7z");
+            Assert.AreEqual(a, true);
+
+            // Включение и исключение файлов
+            ff = new FileFilter("*.txt,*.zip", "????.txt,~*.zip");
+
+            a = ff.isIn("c:\\dir\\test.txt");
+            Assert.AreNotEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\test.log");
+            Assert.AreNotEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\code.zip");
+            Assert.AreEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\~code.zip");
+            Assert.AreNotEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\1234.txt");
+            Assert.AreNotEqual(a, true);
+
+            a = ff.isIn("c:\\dir\\test.7z");
+            Assert.AreNotEqual(a, true);
+
+
+
 
         }
         /// <summary>
@@ -76,17 +118,17 @@ namespace mnBackupTest
             Task job = new Task("Задание1", "Каталог1", "Каталог12");
             job.SourceFilter.IncludeFileMask = "1*";
             job.SourceFilter.ExcludeFileMask = "2*";
-            bak.Tasks.Tasks.Add(job);
+            bak.Add(job);
             job = new Task("Задание2", "Каталог2", "Каталог22");
             job.SourceFilter.IncludeFileMask = "21*";
             job.SourceFilter.ExcludeFileMask = "22*";
-            bak.Tasks.Tasks.Add(job);
-            bak.Tasks.Save("d:\\test.json");
-            bak.Tasks.Clear();
-            bak.Tasks.Read("d:\\test.json");
-            Assert.AreEqual(bak.Tasks.Tasks[0].NameTask,"Задание1");
-            Assert.AreEqual(bak.Tasks.Tasks[0].SourceFilter.IncludeFileMask, "1*");
-            Assert.AreEqual(bak.Tasks.Tasks[0].SourceFilter.ExcludeFileMask, "2*");
+            bak.Add(job);
+            bak.Save("d:\\test.json");
+            bak.Clear();
+            bak.Read("d:\\test.json");
+            Assert.AreEqual(bak.Tasks[0].NameTask,"Задание1");
+            Assert.AreEqual(bak.Tasks[0].SourceFilter.IncludeFileMask, "1*");
+            Assert.AreEqual(bak.Tasks[0].SourceFilter.ExcludeFileMask, "2*");
         }
 
 

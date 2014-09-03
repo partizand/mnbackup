@@ -22,7 +22,7 @@ namespace mnBackupLib
         /// </summary>
         public PeriodName IntervalName
         {
-            get { return IntervalName; }
+            get { return intervalName; }
         }
         [DataMember]
         PeriodName intervalName;
@@ -32,7 +32,7 @@ namespace mnBackupLib
         /// </summary>
         public int IntervalValue
         {
-            get { return IntervalValue; }
+            get { return intervalValue; }
         }
         [DataMember]
         int intervalValue;

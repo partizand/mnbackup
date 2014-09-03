@@ -23,7 +23,7 @@ namespace mnBackupLib
         [DataMember]
         public Period FullIntervalMake;
         /// <summary>
-        /// Колчичество хранимых полных бэкапов
+        /// Период между полными бэкапами
         /// </summary>
         [DataMember]
         public Period FullIntervalSave;
