@@ -16,17 +16,17 @@ namespace mnBackupLib
         /// Тип копирования
         /// </summary>
         [DataMember]
-        public TypeBackup Type;
+        public TypeBackup Type { get; set; }
         /// <summary>
         /// Интервал в днях между полными копиями
         /// </summary>
         [DataMember]
-        public Period FullIntervalMake;
+        public Period FullIntervalMake { get; set; }
         /// <summary>
         /// Период между полными бэкапами
         /// </summary>
         [DataMember]
-        public Period FullIntervalSave;
+        public Period FullIntervalSave { get; set; }
 
         public BackupPlan()
         {
@@ -34,25 +34,8 @@ namespace mnBackupLib
             FullIntervalMake = new Period(Period.PeriodName.Day);
             FullIntervalSave = new Period(Period.PeriodName.Week);
         }
-        /// <summary>
-        /// Возвращает тип копирования который нужно сделать
-        /// </summary>
-        /// <param name="manifest"></param>
-        /// <returns></returns>
-        public TypeBackup GetCurrentTypeBackup(Manifest manifest)
-        {
-            if (Type == TypeBackup.Full) return TypeBackup.Full;
-            bool has=FullIntervalMake.IsInInterval(manifest.GetLastFullDate());
-            if (has) return TypeBackup.Full;
-            else return TypeBackup.Differential;
-            /*
-            DateTime nextFull = manifest.GetLastFullDate().AddDays(FullInterval);
-            if (nextFull > DateTime.Now)
-                return TypeBackup.Differential;
-            else 
-                return TypeBackup.Full;
-             */ 
-        }
+        
+    
 
     }
 }

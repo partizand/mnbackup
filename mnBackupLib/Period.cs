@@ -128,7 +128,10 @@ namespace mnBackupLib
         private DateTime AddSubToDate(DateTime dt, int multiplier)
         {
             DateTime dtAdd;
-            
+            if (multiplier < 0) multiplier = -1;
+            if (multiplier > 0) multiplier = 1;
+            if (multiplier == 0) multiplier = 1;
+
             switch (intervalName)
             {
                 case PeriodName.Day:

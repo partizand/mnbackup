@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C# Express 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mnBackupLib", "mnBackupLib\mnBackupLib.csproj", "{626FBAE3-A589-48B2-8714-DD25ED3CBA96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mnBackup.Lib", "mnBackupLib\mnBackup.Lib.csproj", "{626FBAE3-A589-48B2-8714-DD25ED3CBA96}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mnBackup", "mnBackup\mnBackup.csproj", "{D2809386-5ABB-47E6-A4A5-EEB882766EA1}"
 EndProject

@@ -40,12 +40,12 @@ namespace mnBackupLib
         /// Обновляет статус. Если новый статус хуже (больше) он становится текущим
         /// </summary>
         /// <param name="status"></param>
-        public void AddStatus(T status)
+        public void UpdateStatus(T newStatus)
         {
             //int i = status.ToInt32( ToInt32();
 
-            if (_status.CompareTo(status) < 0)
-                _status = status;
+            if (_status.CompareTo(newStatus) < 0)
+                _status = newStatus;
         }
 
     }

@@ -61,9 +61,9 @@
     <Compile Include="StatusInfoTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\mnBackupLib\mnBackupLib.csproj">
+    <ProjectReference Include="..\mnBackupLib\mnBackup.Lib.csproj">
       <Project>{626FBAE3-A589-48B2-8714-DD25ED3CBA96}</Project>
-      <Name>mnBackupLib</Name>
+      <Name>mnBackup.Lib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

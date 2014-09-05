@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.Serialization.Json;
+//using System.Runtime.Serialization.Json;
 using System.IO;
 
 namespace mnBackupLib
@@ -24,43 +24,30 @@ namespace mnBackupLib
         /// <summary>
         /// Имя файла с манифестом
         /// </summary>
-        string ManifestFile;
+        public string ManifestFileName
+        {
+            get {return ManifestFile;}
+        }
+        private string ManifestFile;
 
         public Manifest(string manifestFile)
         {
             ManifestFile = manifestFile;
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<BakEntryInfo>));
-            Lines = new List<BakEntryInfo>();
-            if (File.Exists(ManifestFile))
-            {
-                FileStream fs = new FileStream(ManifestFile, FileMode.Open);
-                //List<Task> t=new 
-                Lines.AddRange((List<BakEntryInfo>)serializer.ReadObject(fs));
-                fs.Close();
-            }
-            //FullLines=new List<BakEntryInfo>(Lines.FindAll(obj => obj.TypeBackup == TypeBackup.Full));
-            //DiffLines=new List<BakEntryInfo>(Lines.FindAll(obj => obj.TypeBackup != TypeBackup.Full));
+            
+            
+            Lines =  new List<BakEntryInfo>();
+            Lines = SerialIO.Read<List<BakEntryInfo>>(ManifestFile);
+            if (Lines == null) Lines = new List<BakEntryInfo>();
+            
             Lines.Sort();
         }
         
         /// <summary>
         /// Запись манифеста
         /// </summary>
-        public void Save()
+        public bool Save()
         {
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<BakEntryInfo>));
-            //List<BakEntryInfo> Lines = new List<BakEntryInfo>(FullLines);
-            //Lines.AddRange(DiffLines);
-            try
-            {
-                FileStream fs = new FileStream(ManifestFile, FileMode.Create);
-                serializer.WriteObject(fs, Lines);
-                fs.Close();
-            }
-            catch
-            {
-
-            }
+            return SerialIO.Save(ManifestFile, Lines);
         }
         /// <summary>
         /// Добавить запись об одном копировании
@@ -118,6 +105,19 @@ namespace mnBackupLib
             
 
            
+        }
+        /// <summary>
+        /// Возвращает тип копирования который нужно сделать
+        /// </summary>
+        /// <param name="manifest"></param>
+        /// <returns></returns>
+        public TypeBackup GetCurrentTypeBackup(BackupPlan backupPlan)
+        {
+            if (backupPlan.Type == TypeBackup.Full) return TypeBackup.Full;
+            bool has = backupPlan.FullIntervalMake.IsInInterval(GetLastFullDate());
+            if (has) return TypeBackup.Full;
+            else return TypeBackup.Differential;
+            
         }
         
         

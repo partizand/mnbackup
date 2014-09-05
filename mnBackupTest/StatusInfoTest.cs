@@ -15,9 +15,9 @@ namespace mnBackupTest
         {
             StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
             Assert.AreEqual(si.Status, StatusBackup.OK,"Первоначально должно быть ОК");
-            si.AddStatus(StatusBackup.Error);
+            si.UpdateStatus(StatusBackup.Error);
             Assert.AreEqual(si.Status, StatusBackup.Error, "Обновилось до error");
-            si.AddStatus(StatusBackup.Warning);
+            si.UpdateStatus(StatusBackup.Warning);
             Assert.AreNotEqual(si.Status, StatusBackup.Warning, "Warning ниже error");
 
             //bool a = true;
@@ -33,11 +33,11 @@ namespace mnBackupTest
             
 
             StatusInfo<bool> isError = new StatusInfo<bool>(false);
-            isError.AddStatus(false);
+            isError.UpdateStatus(false);
             Assert.AreEqual(isError.Status, false, "IsError в начале false");
-            isError.AddStatus(true);
+            isError.UpdateStatus(true);
             Assert.AreEqual(isError.Status, true, "IsError в конце true");
-            isError.AddStatus(false);
+            isError.UpdateStatus(false);
             Assert.AreEqual(isError.Status, true, "IsError в конце все равно true");
 
 

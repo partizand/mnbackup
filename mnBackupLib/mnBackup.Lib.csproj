@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\!Libs\CommandLine\src\libcmdline\bin\Release\NET35\CommandLine.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=3.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\!Libs\NLog\net35\NLog.dll</HintPath>
@@ -40,6 +44,7 @@
       <HintPath>..\..\!Libs\SevenZipSharp\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -68,6 +73,7 @@
     <Compile Include="Period.cs" />
     <Compile Include="Manifest.cs" />
     <Compile Include="BakEntryInfo.cs" />
+    <Compile Include="SerialIO.cs" />
     <Compile Include="StatusInfo.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

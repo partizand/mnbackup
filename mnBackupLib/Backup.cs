@@ -5,8 +5,7 @@ using System.Text;
 using NLog;
 using SevenZip;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
+
 
 namespace mnBackupLib
 {
@@ -21,11 +20,20 @@ namespace mnBackupLib
     public class Backup
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        /// <summary>
-        /// Имя файла для информации о бэкапах
-        /// </summary>
-        //public const string ManifestFile="manifest";
 
+        /// <summary>
+        /// Имя файла с заданиями по умолчанию
+        /// </summary>
+        public const string DefaultConfigFileName="mnbackup.json";
+        /*
+        {
+            get { return "const"; }
+        }
+        */
+
+        /// <summary>
+        /// Список заданий
+        /// </summary>
         public List<Task> Tasks
         {
             get { return _tasks; }
@@ -55,39 +63,25 @@ namespace mnBackupLib
         }
 
         /// <summary>
-        /// Прочитать задания из файла. Задания добавляются к текущим
+        /// Прочитать задания из файла. Задания добавляются к текущим. Тип определяется по расширению. По умолчанию JSON
         /// </summary>
         /// <param name="FileName"></param>
         public void Read(string FileName)
         {
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Task>));
-            if (File.Exists(FileName))
-            {
-                FileStream fs = new FileStream(FileName, FileMode.Open);
-                //List<Task> t=new 
-                _tasks.AddRange((List<Task>)serializer.ReadObject(fs));
-                fs.Close();
-            }
+            List<Task> tsks = SerialIO.Read<List<Task>>(FileName);
+            _tasks.AddRange(tsks);
         }
 
         /// <summary>
-        /// Записывает список заданий в файл (JSON)
+        /// Записывает список заданий в файл. Тип определяется по расширению. По умолчанию JSON
         /// </summary>
         /// <param name="FileName"></param>
-        public void Save(string FileName)
+        public bool Save(string FileName)
         {
 
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Task>));
-            try
-            {
-                FileStream fs = new FileStream(FileName, FileMode.Create);
-                serializer.WriteObject(fs, _tasks);
-                fs.Close();
-            }
-            catch
-            {
-
-            }
+            return SerialIO.Save(FileName, _tasks);
+            
+            
         }
         /// <summary>
         /// Очищает список заданий
@@ -138,10 +132,11 @@ namespace mnBackupLib
                 }
             }
 
-
+           
+           
             
             Manifest manifest = new Manifest(job.GetManifestFile());
-            TypeBackup BakType=job.Plan.GetCurrentTypeBackup(manifest);
+            TypeBackup BakType = manifest.GetCurrentTypeBackup(job.Plan);
             if (BakType == TypeBackup.Differential) // Текущее копирование не полное
             {
                 // Чутка подправим фильтр
@@ -161,7 +156,7 @@ namespace mnBackupLib
             
             if (!suc)
             {
-                si.AddStatus(StatusBackup.Error);
+                si.UpdateStatus(StatusBackup.Error);
             }
 
             // Добавляем запись в манифест
@@ -171,7 +166,7 @@ namespace mnBackupLib
             // Удаляем старые архивы
             //StatusBackup sb = StatusBackup.OK;
             StatusBackup sb = DeleteOldArh(job, ref manifest);
-            si.AddStatus(sb);
+            si.UpdateStatus(sb);
             
             manifest.Save();
 
@@ -202,10 +197,11 @@ namespace mnBackupLib
                 if (suc)
                 {
                     manifest.Delete(baks[i].BackupDate);
+                    
                 }
                 else
                 {
-                    si.AddStatus(StatusBackup.Warning);
+                    si.UpdateStatus(StatusBackup.Warning);
                     logger.Warn("Не найден архив для удаления {0}", fullArhName);
                 }
             }

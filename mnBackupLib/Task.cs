@@ -22,6 +22,7 @@ namespace mnBackupLib
             NameTask = nameTask;
             Source = source;
             Destination = destination;
+            Init();
         }
 
         /// <summary>
@@ -87,51 +88,60 @@ namespace mnBackupLib
             return files.ToArray();
 
         }
+        /// <summary>
+        /// Первоначальная инициализация для конструкторов
+        /// </summary>
+        private void Init()
+        {
+            Plan = new BackupPlan();
+            SourceFilter = new FileFilter();
+            ArhParam = new CompressParam();
+        }
 
         /// <summary>
         /// Имя задания
         /// </summary>
         [DataMember]
-        public string NameTask;
+        public string NameTask { get; set; }
         
         /// <summary>
         /// Префикс имени архива
         /// </summary>
         [DataMember]
-        public string Prefix;
+        public string Prefix { get; set; }
         
         /// <summary>
         /// Задание разрешено, будет запускаться
         /// </summary>
         [DataMember]
-        public bool Enabled;
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// Каталог источник
         /// </summary>
         [DataMember]
-        public string Source;
+        public string Source { get; set; }
         
         /// <summary>
         /// Каталог приемник
         /// </summary>
         [DataMember]
-        public string Destination;
+        public string Destination { get; set; }
         
         /// <summary>
         /// План бэкапа (полный, разностный, сколько копий хранить и т.д.)
         /// </summary>
         [DataMember]
-        public BackupPlan Plan=new BackupPlan();
+        public BackupPlan Plan{ get; set; }//=new BackupPlan();
 
         /// <summary>
         /// Фильтр
         /// </summary>
         [DataMember]
-        public FileFilter SourceFilter=new FileFilter();
+        public FileFilter SourceFilter { get; set; }//=new FileFilter();
 
         [DataMember]
-        public CompressParam ArhParam=new CompressParam();
+        public CompressParam ArhParam { get; set; }//=new CompressParam();
     }
     
 }
