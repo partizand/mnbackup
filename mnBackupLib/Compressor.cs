@@ -51,6 +51,7 @@ namespace mnBackupLib
 
             catch (Exception e)
             {
+                
                 logger.Error("Error compressing \"{0}\"", e.Message);
                 return false;
             }

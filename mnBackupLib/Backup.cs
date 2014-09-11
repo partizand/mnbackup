@@ -13,23 +13,10 @@ namespace mnBackupLib
     /// Тип бэкапа. Полный, разностный
     /// </summary>
     public enum TypeBackup { Full, Differential };
-    
-
-    
 
     public class Backup
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// Имя файла с заданиями по умолчанию
-        /// </summary>
-        public const string DefaultConfigFileName="mnbackup.json";
-        /*
-        {
-            get { return "const"; }
-        }
-        */
 
         /// <summary>
         /// Список заданий
@@ -41,6 +28,8 @@ namespace mnBackupLib
 
         private List<Task> _tasks = new List<Task>();
 
+        public Config Conf;
+
         /// <summary>
         /// Количество заданий
         /// </summary>
@@ -51,7 +40,12 @@ namespace mnBackupLib
 
         public Backup()
         {
-            
+            Conf = new Config();
+        }
+
+        public Backup(Options options)
+        {
+            Conf = new Config(options);
         }
         /// <summary>
         /// Добавить задание в список
@@ -97,6 +91,7 @@ namespace mnBackupLib
         public void Start()
         {
 
+            
             foreach (Task job in _tasks)
             {
                 StartTask(job);
@@ -108,7 +103,7 @@ namespace mnBackupLib
         /// <param name="job"></param>
         public StatusBackup StartTask(Task job)
         {
-            logger.Info("Запуск задания {0}", job.NameTask);
+            logger.Info("Start task {0}", job.NameTask);
             StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
             
             //StatusInfo<bool> si2 = new StatusInfo<bool>(true);
@@ -118,6 +113,7 @@ namespace mnBackupLib
             if (!Directory.Exists(job.Source))
             {
                 logger.Error("Каталог источника не существует {0}", job.Source);
+                logger.Error("Task finished with status {0}", si.Status);
                 return StatusBackup.Fatal;
             }
 
@@ -127,16 +123,16 @@ namespace mnBackupLib
                 bool cr = FileManage.DirectoryCreate(job.Destination);
                 if (!cr)
                 {
+                    
                     logger.Error("Каталог приемника не существует {0}", job.Destination);
+                    logger.Error("Task finished with status {0}", si.Status);
                     return StatusBackup.Fatal;
                 }
             }
-
-           
-           
             
             Manifest manifest = new Manifest(job.GetManifestFile());
             TypeBackup BakType = manifest.GetCurrentTypeBackup(job.Plan);
+            logger.Info("Backup type: {0}", BakType);
             if (BakType == TypeBackup.Differential) // Текущее копирование не полное
             {
                 // Чутка подправим фильтр
@@ -148,21 +144,38 @@ namespace mnBackupLib
             string ArhName = job.GetArhName(BakType.ToString());
             string[] files = job.GetFiles(); // файлы для обработки
 
-            string FullArhName = Path.Combine(job.Destination, ArhName);
-
-            // Сжать файлы синхронно
-            Compressor cmp = new Compressor(job.ArhParam);
-            bool suc=cmp.CompressFiles(FullArhName, files);
             
-            if (!suc)
+
+            if (files.Length > 0)
             {
-                si.UpdateStatus(StatusBackup.Error);
-            }
 
-            // Добавляем запись в манифест
-            BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, ArhName);
-            manifest.Add(bakEntry);
-            
+                string FullArhName = Path.Combine(job.Destination, ArhName);
+
+                // Сжать файлы синхронно
+                Compressor cmp = new Compressor(job.ArhParam);
+                bool suc = cmp.CompressFiles(FullArhName, files);
+
+                if (!suc)
+                {
+                    si.UpdateStatus(StatusBackup.Error);
+                }
+
+                // Добавляем запись в манифест
+                BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, ArhName);
+                manifest.Add(bakEntry);
+            }
+            else // нечего копировать
+            {
+                if (BakType == TypeBackup.Full)
+                {
+                    logger.Error("Nothing to full backup");
+                    si.UpdateStatus(StatusBackup.Fatal);
+                }
+                else
+                {
+                    logger.Info("Nothing to backup");
+                }
+            }
             // Удаляем старые архивы
             //StatusBackup sb = StatusBackup.OK;
             StatusBackup sb = DeleteOldArh(job, ref manifest);
@@ -171,6 +184,7 @@ namespace mnBackupLib
             manifest.Save();
 
 
+            logger.Info("Task finished with status {0}", si.Status);
 
             return (StatusBackup)si.Status;
         }
@@ -184,7 +198,7 @@ namespace mnBackupLib
             // Какие архивы нужно удалить
             //StatusBackup st = StatusBackup.OK;
             StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
-            BakEntryInfo[] baks = manifest.GetAllBeforePeriod(job.Plan.FullIntervalSave);
+            BakEntryInfo[] baks = manifest.GetAllBeforePeriod(job.Plan.Store);
             if (baks == null) return si.Status;
             if (baks.Length == 0) return si.Status;
             string fullArhName;
@@ -196,6 +210,7 @@ namespace mnBackupLib
                 suc = FileManage.FileDelete(fullArhName);
                 if (suc)
                 {
+                    logger.Info("Удален архив {0}", fullArhName);
                     manifest.Delete(baks[i].BackupDate);
                     
                 }

@@ -18,11 +18,29 @@ namespace mnBackupLib
         
         public Task(string nameTask, string source,string destination)
         {
-            Enabled = true;
+            //Enabled = true;
             NameTask = nameTask;
             Source = source;
             Destination = destination;
             Init();
+        }
+        public Task(TaskSubOptions taskOptions)
+        {
+            Init();
+            this.NameTask = "CmdTask";
+            this.Source = taskOptions.Source;
+            this.Destination = taskOptions.Destination;
+            this.Plan.Type = taskOptions.typeBackup;
+        }
+        /// <summary>
+        /// Первоначальная инициализация для конструкторов
+        /// </summary>
+        private void Init()
+        {
+            Enabled = true;
+            Plan = new BackupPlan();
+            SourceFilter = new FileFilter();
+            ArhParam = new CompressParam();
         }
 
         /// <summary>
@@ -31,7 +49,8 @@ namespace mnBackupLib
         /// <returns></returns>
         public string GetManifestFile()
         {
-            string manifestFile = Path.Combine(Destination, "manifest"+GetPrefix());
+            string manifestFile = Path.Combine(Destination, "manifest"+GetPrefix()+".json");
+            
             return manifestFile;
         }
 
@@ -88,15 +107,7 @@ namespace mnBackupLib
             return files.ToArray();
 
         }
-        /// <summary>
-        /// Первоначальная инициализация для конструкторов
-        /// </summary>
-        private void Init()
-        {
-            Plan = new BackupPlan();
-            SourceFilter = new FileFilter();
-            ArhParam = new CompressParam();
-        }
+        
 
         /// <summary>
         /// Имя задания

@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>mnBackupLib</RootNamespace>
-    <AssemblyName>mnBackupLib</AssemblyName>
+    <AssemblyName>mnBackup.Lib</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -68,19 +68,31 @@
     <Compile Include="BackupPlan.cs" />
     <Compile Include="Compressor.cs" />
     <Compile Include="CompressParam.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="FileFilter.cs" />
     <Compile Include="FileManage.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="Period.cs" />
     <Compile Include="Manifest.cs" />
     <Compile Include="BakEntryInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="SerialIO.cs" />
     <Compile Include="StatusInfo.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

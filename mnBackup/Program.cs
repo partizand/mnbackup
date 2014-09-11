@@ -12,16 +12,16 @@ using CommandLine.Text;
 
 namespace mnBackup
 {
-    partial class Program
+    class Program
     {
         static void Main(string[] args)
         {
-            Backup bak = new Backup();
+            
 
             
 
             // Тест
-            Task job = new Task("test","d:\\temp\\testmn\\source","d:\\temp\\testmn\\dest");
+            //Task job = new Task("test","d:\\temp\\testmn\\source","d:\\temp\\testmn\\dest");
             //job.SourceFilter.IncludeFileMask = "*";
 
 
@@ -31,37 +31,62 @@ namespace mnBackup
             Options options = new Options ();
             ParserSettings set = new ParserSettings();
 
-            options = Options.Read("");
+            
 
             Parser parser = new CommandLine.Parser  ( with => with.HelpWriter = Console.Error);
 
-            if (parser.ParseArgumentsStrict(args, options))
+
+            string invokedVerb="";
+            object invokedVerbInstance=new TaskSubOptions();
+
+            //OnVerbT verb=new OnVerbT(on
+
+            //CommandLine.Parser.Default.ParseArguments(args, options,
+
+            bool a = CommandLine.Parser.Default.ParseArguments(args, options,
+              (verb, subOptions) =>
+              {
+                  // if parsing succeeds the verb name and correct instance
+                  // will be passed to onVerbCommand delegate (string,object)
+                  invokedVerb = verb;
+                  invokedVerbInstance = subOptions;
+
+              });
+
+            if (!a)
             {
-                Run(options);
+                
+                Environment.Exit(CommandLine.Parser.DefaultExitCodeFail);
             }
-            else
+            
+            Backup bak = new Backup();
+
+            if (invokedVerb == "task") // запуск одного задания из командной строки
             {
-                Environment.Exit(-2);
+                var commitSubOptions = (TaskSubOptions)invokedVerbInstance;
+                //Console.WriteLine("Source is " + commitSubOptions.Source);
+                //Console.WriteLine("Source2 is " + options.TaskOpt.Source);
+
+                Task job = new Task(commitSubOptions);
+                
+
+                bak.StartTask(job);
             }
 
-            //bak.Add(job);
+            if (invokedVerb == "run") // запуск заданий из файла
+            {
+                var commitSubOptions = (RunSubOptions)invokedVerbInstance;
+                bak.Read(commitSubOptions.TaskFile);
+                bak.Start();
+            }
             
-            //bak.Start();
+            
             
             
         }
-        static void Run(Options options)
-        {
-            /*
-            if (String.IsNullOrEmpty(options.ConfigFile))
-            {
-                options.ConfigFile = "conf.json";
-            }
-             */ 
-            Console.WriteLine("Conf file is " +options.ConfigFile);
-
-            options.Save("NewOpt.json");
-
-        }
+        
+    
+        
+        
     }
 }

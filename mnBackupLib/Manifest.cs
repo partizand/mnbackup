@@ -94,13 +94,21 @@ namespace mnBackupLib
             // Индекс первого полного копирования которое нужно оставить
             int iLastFullToStay = Lines.FindIndex(obj => obj.BackupDate >= dtBefore && obj.TypeBackup == TypeBackup.Full);
             // Все за этим индексом удалить
-            List<BakEntryInfo> fullToDelete = Lines.GetRange(0, iLastFullToStay );
+            if (iLastFullToStay > -1)
+            {
+                List<BakEntryInfo> fullToDelete = Lines.GetRange(0, iLastFullToStay);
+                if (fullToDelete == null) return null;
+                return fullToDelete.ToArray();
+            }
+            else
+            {
+                return null;
+            }
             
-            if (fullToDelete == null) return null;
-            if (fullToDelete.Count == 0) return null;
+            //if (fullToDelete.Count == 0) return null;
 
 
-            return fullToDelete.ToArray();
+           
 
             
 
@@ -114,7 +122,7 @@ namespace mnBackupLib
         public TypeBackup GetCurrentTypeBackup(BackupPlan backupPlan)
         {
             if (backupPlan.Type == TypeBackup.Full) return TypeBackup.Full;
-            bool has = backupPlan.FullIntervalMake.IsInInterval(GetLastFullDate());
+            bool has = backupPlan.Interval.IsInInterval(GetLastFullDate());
             if (has) return TypeBackup.Full;
             else return TypeBackup.Differential;
             

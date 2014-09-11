@@ -55,7 +55,7 @@ namespace mnBackupLib
                 fs.Close();
                 return true;
             }
-            catch
+            catch (Exception e)
             {
                 return false;
             }
@@ -123,9 +123,16 @@ namespace mnBackupLib
         /// <returns></returns>
         public static T ReadJSON<T>(Stream stream)
         {
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
-            T obj = (T)serializer.ReadObject(stream);
-            return obj;
+            try
+            {
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
+                T obj = (T)serializer.ReadObject(stream);
+                return obj;
+            }
+            catch
+            {
+                return default(T);
+            }
             
         }
 

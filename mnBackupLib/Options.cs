@@ -4,36 +4,32 @@ using System.Linq;
 using System.Text;
 using CommandLine;
 using CommandLine.Text;
-using mnBackupLib;
 using System.Runtime.Serialization;
-//using System.Runtime.Serialization.Json;
-using System.IO;
 
-namespace mnBackup
+namespace mnBackupLib
 {
-    partial class Program
+    /// <summary>
+    /// Настройки опций командной строки
+    /// </summary>
+    public sealed class Options
     {
-        /*
-        private enum OptimizeFor
+
+        public Options()
         {
-            Unspecified,
-            Speed,
-            Accuracy
+            // Since we create this instance the parser will not overwrite it
+            TaskOpt = new TaskSubOptions();// { Patch = true };
+            RunOpt = new RunSubOptions();
         }
-        */
-        [DataContract]
-        private sealed class Options
-        {
-            //public const string DefaultConfigFileName = "conf.json";
 
-            [DataMember]
-            [Option('c', "conf", MetaValue = "FILE", DefaultValue = Backup.DefaultConfigFileName, HelpText = "Config file.")]
-            public string ConfigFile { get; set; }
+        [VerbOption("task", HelpText = "Set task from command line.")]
+        public TaskSubOptions TaskOpt { get; set; }
 
-            [Option('r', "run", Required = true, HelpText = "Run backup.")]
-            public bool RunBackup { get; set; }
+        [VerbOption("run", HelpText = "Run task from file.")]
+        public RunSubOptions RunOpt { get; set; }
 
-            
+        
+
+
 
 
             /*
@@ -75,40 +71,53 @@ namespace mnBackup
             [ParserState]
             public IParserState LastParserState { get; set; }
 
+            [HelpVerbOption]
+            public string GetUsage(string verb)
+            {
+                return HelpText.AutoBuild(this, verb);
+            }
+        /*
             [HelpOption]
             public string GetUsage()
             {
                 return HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
             }
-
-            /// <summary>
-            /// Записать настройки в файл 
-            /// </summary>
-            /// <param name="FileName"></param>
-            public bool Save(string FileName)
-            {
-
-                return SerialIO.Save(FileName, this);
-                
-            }
-            /// <summary>
-            /// Прочитать настройки из файла.
-            /// </summary>
-            /// <param name="FileName"></param>
-            public static Options Read(string FileName)
-            {
-                string fName = FileName;
-                if (String.IsNullOrEmpty(FileName)) fName = "conf.json";
-                Options opt = SerialIO.Read<Options>(fName);
-                if (opt == null)
-                    opt = new Options();
-                return opt;
-                
-            }
-            
+         */ 
 
             
 
-        }
+
+
+
+        
+
+    }
+
+    public class TaskSubOptions
+    {
+        [Option('s', "source", MetaValue = "Dir", Required = true, HelpText = "Source dir")]
+        public string Source { get; set; }
+
+        [Option('d', "dest", MetaValue = "Dir", Required = true, HelpText = "Destination dir")]
+        public string Destination { get; set; }
+
+        [Option('t', "type", DefaultValue = TypeBackup.Full, HelpText = "Type backup Full|Differential")]
+        public TypeBackup typeBackup { get; set; }
+
+        [Option("Interval", MetaValue = "period", DefaultValue=Config.DEFAULT_FULL_INTERVAL, HelpText = "Period in days between full backup for diff backup. May use 1d,1w,1m or number days")]
+        public string FullInterval { get; set; }
+
+        [Option("Store", MetaValue = "period", DefaultValue = Config.DEFAULT_FULL_STORE, HelpText = "Period in days to store full backups. May use 1d,1w,1m or number days. 0 - store all backups")]
+        public string FullSave { get; set; }
+
+        
+    }
+
+    public class RunSubOptions
+    {
+        [Option('f', "file", MetaValue = "FILE", MutuallyExclusiveSet = "file", DefaultValue = Config.DEFAULT_TASK_FILENAME, HelpText = "Task file")]
+        public string TaskFile { get; set; }
+
+
     }
 }
