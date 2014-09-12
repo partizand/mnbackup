@@ -105,17 +105,17 @@ namespace mnBackupLib
         public TypeBackup typeBackup { get; set; }
 
         [Option("Interval", MetaValue = "period", DefaultValue=Config.DEFAULT_FULL_INTERVAL, HelpText = "Period in days between full backup for diff backup. May use 1d,1w,1m or number days")]
-        public string FullInterval { get; set; }
+        public string Interval { get; set; }
 
         [Option("Store", MetaValue = "period", DefaultValue = Config.DEFAULT_FULL_STORE, HelpText = "Period in days to store full backups. May use 1d,1w,1m or number days. 0 - store all backups")]
-        public string FullSave { get; set; }
+        public string Store { get; set; }
 
         
     }
 
     public class RunSubOptions
     {
-        [Option('f', "file", MetaValue = "FILE", MutuallyExclusiveSet = "file", DefaultValue = Config.DEFAULT_TASK_FILENAME, HelpText = "Task file")]
+        [Option('f', "file", MetaValue = "FILE", DefaultValue = Config.DEFAULT_TASK_FILENAME, HelpText = "Task file")]
         public string TaskFile { get; set; }
 
 

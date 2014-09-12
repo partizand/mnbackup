@@ -31,6 +31,9 @@ namespace mnBackupLib
             this.Source = taskOptions.Source;
             this.Destination = taskOptions.Destination;
             this.Plan.Type = taskOptions.typeBackup;
+            this.Plan.Interval = new Period(taskOptions.Interval);
+            this.Plan.Store = new Period(taskOptions.Store);
+
         }
         /// <summary>
         /// Первоначальная инициализация для конструкторов
