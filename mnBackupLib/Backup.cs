@@ -141,7 +141,7 @@ namespace mnBackupLib
             }
 
             // Имя архива
-            string ArhName = job.GetArhName(BakType.ToString());
+            string FullArhName = job.GetArhName(BakType.ToString());
             string[] files = job.GetFiles(); // файлы для обработки
 
             
@@ -149,9 +149,10 @@ namespace mnBackupLib
             if (files.Length > 0)
             {
 
-                string FullArhName = Path.Combine(job.Destination, ArhName);
+                //string FullArhName = Path.Combine(job.Destination, ArhName);
 
                 // Сжать файлы синхронно
+                /*
                 Compressor cmp = new Compressor(job.ArhParam);
                 bool suc = cmp.CompressFiles(FullArhName, files);
 
@@ -159,9 +160,40 @@ namespace mnBackupLib
                 {
                     si.UpdateStatus(StatusBackup.Error);
                 }
+                */
+                StatusBackup sb2 = StatusBackup.OK;
+                if (job.Shadow)
+                {
+                    logger.Info("Shadow copy using");
+                    try
+                    {
+                        using (VssBackup vss = new VssBackup())
+                        {
+                            logger.Info("Creating shadow copy");
+                            vss.Setup(Path.GetPathRoot(job.Source));
 
+                            string[] ShadowFiles = vss.GetSnapshotPath(files);
+
+                            // Here we use the AlphaFS library to make the copy.
+                            //Alphaleonis.Win32.Filesystem.File.Copy(snap_path, backup_path);
+                            sb2 = DoFiles(job, FullArhName, ShadowFiles);
+                            logger.Info("Deleting shadow copy");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("Shadow error {0}", e.Message);
+                        si.UpdateStatus(StatusBackup.Error);
+                    }
+                }
+                else
+                {
+
+                    sb2 = DoFiles(job, FullArhName, files);
+                }
+                si.UpdateStatus(sb2);
                 // Добавляем запись в манифест
-                BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, ArhName);
+                BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, Path.GetFileName(FullArhName));
                 manifest.Add(bakEntry);
             }
             else // нечего копировать
@@ -187,6 +219,22 @@ namespace mnBackupLib
             logger.Info("Task finished with status {0}", si.Status);
 
             return (StatusBackup)si.Status;
+        }
+
+        StatusBackup DoFiles(Task job,string FullArhName, string[] files)
+        {
+
+            StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
+            // Сжать файлы синхронно
+            Compressor cmp = new Compressor(job.ArhParam);
+            bool suc = cmp.CompressFiles(FullArhName, files);
+
+            if (!suc)
+            {
+                si.UpdateStatus(StatusBackup.Error);
+            }
+            return si.Status;
+            
         }
 
         /// <summary>

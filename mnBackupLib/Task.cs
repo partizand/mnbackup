@@ -14,8 +14,60 @@ namespace mnBackupLib
     [DataContract]
     public class Task
     {
-        public enum Action {Copy,Arh };
-        
+        //public enum Action {Copy,Arh };
+
+
+        /// <summary>
+        /// Имя задания
+        /// </summary>
+        [DataMember]
+        public string NameTask { get; set; }
+
+        /// <summary>
+        /// Префикс имени архива
+        /// </summary>
+        [DataMember]
+        public string Prefix { get; set; }
+
+        /// <summary>
+        /// Задание разрешено, будет запускаться
+        /// </summary>
+        [DataMember]
+        public bool Enabled { get; set; }
+
+        /// <summary>
+        /// Использовать теневое копирование
+        /// </summary>
+        [DataMember]
+        public bool Shadow { get; set; }
+
+        /// <summary>
+        /// Каталог источник
+        /// </summary>
+        [DataMember]
+        public string Source { get; set; }
+
+        /// <summary>
+        /// Каталог приемник
+        /// </summary>
+        [DataMember]
+        public string Destination { get; set; }
+
+        /// <summary>
+        /// План бэкапа (полный, разностный, сколько копий хранить и т.д.)
+        /// </summary>
+        [DataMember]
+        public BackupPlan Plan { get; set; }//=new BackupPlan();
+
+        /// <summary>
+        /// Фильтр
+        /// </summary>
+        [DataMember]
+        public FileFilter SourceFilter { get; set; }//=new FileFilter();
+
+        [DataMember]
+        public CompressParam ArhParam { get; set; }//=new CompressParam();
+
         public Task(string nameTask, string source,string destination)
         {
             //Enabled = true;
@@ -30,6 +82,7 @@ namespace mnBackupLib
             this.NameTask = "CmdTask";
             this.Source = taskOptions.Source;
             this.Destination = taskOptions.Destination;
+            this.Shadow = taskOptions.Shadow;
             this.Plan.Type = taskOptions.typeBackup;
             this.Plan.Interval = new Period(taskOptions.Interval);
             this.Plan.Store = new Period(taskOptions.Store);
@@ -41,6 +94,7 @@ namespace mnBackupLib
         private void Init()
         {
             Enabled = true;
+            Shadow = false;
             Plan = new BackupPlan();
             SourceFilter = new FileFilter();
             ArhParam = new CompressParam();
@@ -67,6 +121,7 @@ namespace mnBackupLib
             string pref=GetPrefix();
             
             pref = pref + DateTime.Now.ToString("_yyMMdd-HHmmss_") + type + ".7z";// Добавить текущую дату и время
+            pref = Path.Combine(this.Destination, pref);
             return pref; 
         }
         /// <summary>
@@ -112,50 +167,7 @@ namespace mnBackupLib
         }
         
 
-        /// <summary>
-        /// Имя задания
-        /// </summary>
-        [DataMember]
-        public string NameTask { get; set; }
-        
-        /// <summary>
-        /// Префикс имени архива
-        /// </summary>
-        [DataMember]
-        public string Prefix { get; set; }
-        
-        /// <summary>
-        /// Задание разрешено, будет запускаться
-        /// </summary>
-        [DataMember]
-        public bool Enabled { get; set; }
-
-        /// <summary>
-        /// Каталог источник
-        /// </summary>
-        [DataMember]
-        public string Source { get; set; }
-        
-        /// <summary>
-        /// Каталог приемник
-        /// </summary>
-        [DataMember]
-        public string Destination { get; set; }
-        
-        /// <summary>
-        /// План бэкапа (полный, разностный, сколько копий хранить и т.д.)
-        /// </summary>
-        [DataMember]
-        public BackupPlan Plan{ get; set; }//=new BackupPlan();
-
-        /// <summary>
-        /// Фильтр
-        /// </summary>
-        [DataMember]
-        public FileFilter SourceFilter { get; set; }//=new FileFilter();
-
-        [DataMember]
-        public CompressParam ArhParam { get; set; }//=new CompressParam();
+      
     }
     
 }

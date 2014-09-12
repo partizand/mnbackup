@@ -31,6 +31,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AlphaVSS.51.x86, Version=1.1.4000.3, Culture=neutral, PublicKeyToken=959d3993561034e3, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\!Libs\AlphaVSS\Bin\Release\AlphaVSS.51.x86.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.52.x64, Version=1.1.4000.3, Culture=neutral, PublicKeyToken=959d3993561034e3, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\!Libs\AlphaVSS\Bin\Release\AlphaVSS.52.x64.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.52.x86, Version=1.1.4000.3, Culture=neutral, PublicKeyToken=959d3993561034e3, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\!Libs\AlphaVSS\Bin\Release\AlphaVSS.52.x86.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.60.x64, Version=1.1.4000.3, Culture=neutral, PublicKeyToken=959d3993561034e3, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\!Libs\AlphaVSS\Bin\Release\AlphaVSS.60.x64.dll</HintPath>
+    </Reference>
+    <Reference Include="AlphaVSS.60.x86, Version=1.1.4000.3, Culture=neutral, PublicKeyToken=959d3993561034e3, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\!Libs\AlphaVSS\Bin\Release\AlphaVSS.60.x86.dll</HintPath>
+    </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\!Libs\CommandLine\src\libcmdline\bin\Release\NET35\CommandLine.dll</HintPath>

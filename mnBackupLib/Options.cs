@@ -110,6 +110,9 @@ namespace mnBackupLib
         [Option("Store", MetaValue = "period", DefaultValue = Config.DEFAULT_FULL_STORE, HelpText = "Period in days to store full backups. May use 1d,1w,1m or number days. 0 - store all backups")]
         public string Store { get; set; }
 
+        [Option("shadow", DefaultValue =false, HelpText = "Use volume shadow copying.")]
+        public bool Shadow { get; set; }
+
         
     }
 
