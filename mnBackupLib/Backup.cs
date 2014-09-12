@@ -176,6 +176,7 @@ namespace mnBackupLib
 
                             // Here we use the AlphaFS library to make the copy.
                             //Alphaleonis.Win32.Filesystem.File.Copy(snap_path, backup_path);
+                            
                             sb2 = DoFiles(job, FullArhName, ShadowFiles);
                             logger.Info("Deleting shadow copy");
                         }
