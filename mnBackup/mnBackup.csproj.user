@@ -1,8 +1,8 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartArguments>task -s D:\Temp\mnBackupTest\source -d D:\Temp\mnBackupTest\dest --shadow</StartArguments>
+    <StartArguments>task -s C:\wordrep -d D:\Temp\mnBackupTest\dest --shadow</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <StartArguments>task -s D:\Temp\mnBackupTest\source -d D:\Temp\mnBackupTest\dest --shadow</StartArguments>
+    <StartArguments>task -s C:\wordrep -d D:\Temp\mnBackupTest\dest --shadow</StartArguments>
   </PropertyGroup>
 </Project>

@@ -1,119 +1,222 @@
-/* Copyright (c) 2008-2012 Peter Palotas
- *  
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- *  
- *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
- *  
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- *  THE SOFTWARE.
- */
-
-#region Copyright Notice
-/*
- * AlphaVSS Sample Code
- * Written by Jay Miller
- * 
- * This code is hereby released into the public domain, This applies
- * worldwide.
- */
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Alphaleonis.Win32.Vss;
+using System.IO;
+using NLog;
 
 namespace mnBackupLib
 {
-   /// <summary>
-   /// Utility class to manage the snapshot's contents and ID.
-   /// </summary>
-   class Snapshot : IDisposable
-   {
-      /// <summary>A reference to the VSS context.</summary>
-      IVssBackupComponents _backup;
-      
-      /// <summary>Metadata about this object's snapshot.</summary>
-      VssSnapshotProperties _props;
+    /// <summary>
+    /// Создание теневой копии тома
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// using (Snapshot snap=new Snapshot("c:\\","L:"))
+    /// {
+    /// snap.DoSnapshotSet()
+    /// //Here you have snapshot of c: mounted to L:
+    /// 
+    /// }
+    /// </code>
+    /// </example>
+    public class Snapshot : IDisposable
+    {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+        
+        // Flag: Has Dispose already been called?
+        bool disposed = false;
+        
+        //IVssImplementation _vssImplementation; 
+        IVssBackupComponents _backup;
 
-      /// <summary>Identifier for the overall shadow copy.</summary>
-      Guid _set_id;
+        /// <summary>Metadata about this object's snapshot.</summary>
+        VssSnapshotProperties _props;
 
-      /// <summary>Identifier for our single snapshot volume.</summary>
-      Guid _snap_id;
+        /// <summary>
+        /// GUID снапшота
+        /// </summary>
+        Guid _snapGuid;
+        /// <summary>
+        /// GUID всего набора снапшотов
+        /// </summary>
+        Guid _setGuid;
 
-      /// <summary>
-      /// Initializes a snapshot.  We save the GUID of this snap in order to
-      /// refer to it elsewhere in the class.
-      /// </summary>
-      /// <param name="backup">A VssBackupComponents implementation for the current OS.</param>
-      public Snapshot(IVssBackupComponents backup)
-      {
-         _backup = backup;
-         _set_id = backup.StartSnapshotSet();
-      }
-
-      /// <summary>
-      /// Dispose of the shadow copies created by this instance.
-      /// </summary>
-      public void Dispose()
-      {
-         try { Delete(); } catch { }
-      }
-
-      /// <summary>
-      /// Adds a volume to the current snapshot.
-      /// </summary>
-      /// <param name="volumeName">Name of the volume to add (eg. "C:\").</param>
-      /// <remarks>
-      /// Note the IsVolumeSupported check prior to adding each volume.
-      /// </remarks>
-      public void AddVolume(string volumeName)
-      {
-         if (_backup.IsVolumeSupported(volumeName))
-            _snap_id = _backup.AddToSnapshotSet(volumeName);
-         else
-            throw new VssVolumeNotSupportedException(volumeName);
-      }
-
-      /// <summary>
-      /// Create the actual snapshot.  This process can take around 10s.
-      /// </summary>
-      public void Copy()
-      {
-          _backup.DoSnapshotSet();
+        /// <summary>
+        /// На какой диск монтируется образ
+        /// </summary>
+        string _MountDriveLetter;
+        /// <summary>
+        /// Для какого диска создается образ. Нужен слэш. Например c:\
+        /// </summary>
+        string _Volume;
+        /// <summary>
+        /// Создает объект. Снапшот не создается
+        /// </summary>
+        /// <param name="Volume">Для какого диска создается образ. Нужен слэш. Например c:\</param>
+        /// <param name="mountDriveLetter">На какой диск монтируется образ</param>
+        public Snapshot(string Volume,string mountDriveLetter)
+        {
+            _Volume = Volume;
+            _MountDriveLetter = mountDriveLetter;
             
-      }
+        }
+        /// <summary>
+        /// Создать снапшот
+        /// </summary>
+        public void DoSnapshotSet()
+        {
+            // VSS step 1: Initialize
+            IVssImplementation _vssImplementation = VssUtils.LoadImplementation();
+            _backup = _vssImplementation.CreateVssBackupComponents();
+            _backup.InitializeForBackup(null);
+            // VSS step 2: Getting Metadata from all the VSS writers
+            _backup.GatherWriterMetadata();
 
-      /// <summary>
-      /// Remove all snapshots.
-      /// </summary>
-      public void Delete()
-      {
-         _backup.DeleteSnapshotSet(_set_id, false);
-      }
+            // VSS step 3: VSS Configuration
+            _backup.SetContext(VssVolumeSnapshotAttributes.Persistent | VssVolumeSnapshotAttributes.NoAutoRelease);
+            _backup.SetBackupState(false, true, Alphaleonis.Win32.Vss.VssBackupType.Full, false);
+            // VSS step 4: Declaring the Volumes that we need to use in this beckup. 
+            // The Snapshot is a volume element (Here come the name "Volume Shadow-Copy")
+            // For each file that we nee to copy we have to make sure that the propere volume is in the "Snapshot Set"
+            _setGuid = _backup.StartSnapshotSet();
+            _snapGuid = _backup.AddToSnapshotSet(_Volume, Guid.Empty);
 
-      /// <summary>
-      /// Gets the string that identifies the root of this snapshot.
-      /// </summary>
-      public string Root
-      {
-         get
-         {
-            if (_props == null)
-               _props = _backup.GetSnapshotProperties(_snap_id);
-            return _props.SnapshotDeviceObject;
-         }
-      }
-   }
+            // VSS step 5: Preparation (Writers & Provaiders need to start preparation)
+            _backup.PrepareForBackup();
+            // VSS step 6: Create a Snapshot For each volume in the "Snapshot Set"
+            logger.Info("Creating snapshot for {0}",_Volume);
+            _backup.DoSnapshotSet();
+            /***********************************
+            /* At this point we have a snapshot!
+            /* This action should not take more then 60 second, regardless of file or disk size.
+            /* THe snapshot is not a backup or any copy!
+            /* please more information at http://technet.microsoft.com/en-us/library/ee923636.aspx
+            /***********************************/
+
+            // VSS step 7: Expose Snapshot
+            /***********************************
+            /* Snapshot path look like:
+             * \\?\Volume{011682bf-23d7-11e2-93e7-806e6f6e6963}\
+             * The build in method System.IO.File.Copy do not work with path like this, 
+             * Therefor, we are going to Expose the Snapshot to our application, 
+             * by mapping the Snapshot to new virtual volume
+             * - Make sure that you are using a volume that is not already exist
+             * - This is only for learning purposes. usually we will use the snapshot directly as i show in the next example in the blog 
+            /***********************************/
+            logger.Info("Exposing snapshot on {0}", _MountDriveLetter);
+            _backup.ExposeSnapshot(_snapGuid, null, VssVolumeSnapshotAttributes.ExposedLocally, _MountDriveLetter);
+        }
+        /// <summary>
+        /// Преобразование пути к файлу на путь в snapshot
+        /// С путями в snapshot System.IO работать не может!
+        /// </summary>
+        /// <param name="localPath">Имя файла в системе</param>
+        /// <returns>Имя файла в снапшоте</returns>
+        public string GetSnapshotPath(string localPath)
+        {
+            
+
+            // This bit replaces the file's normal root information with root
+            // info from our new shadow copy.
+            if (Path.IsPathRooted(localPath))
+            {
+                string root = Path.GetPathRoot(localPath);
+                localPath = localPath.Replace(root, String.Empty);
+            }
+            string slash = Path.DirectorySeparatorChar.ToString();
+            if (!this.Root.EndsWith(slash) && !localPath.StartsWith(slash))
+                localPath = localPath.Insert(0, slash);
+            localPath = localPath.Insert(0, this.Root);
+
+            
+
+            return localPath;
+        }
+        /// <summary>
+        /// Преобразование списка полных путей к файлам на пути в snapshot
+        /// С путями в snapshot System.IO работать не может!
+        /// </summary>
+        /// <param name="localPath">Имя файла в системе</param>
+        /// <returns>Имя файла в снапшоте</returns>
+        public string[] GetSnapshotPath(string[] localPath)
+        {
+            string[] path = new string[localPath.Length];
+            int i;
+            for (i = 0; i < localPath.Length; i++)
+            {
+                path[i] = GetSnapshotPath(localPath[i]);
+            }
+            return path;
+
+        }
+
+        /// <summary>
+        /// Gets the string that identifies the root of this snapshot.
+        /// </summary>
+        public string Root
+        {
+            get
+            {
+                if (_props == null)
+                    _props = _backup.GetSnapshotProperties(_snapGuid);
+                if (!String.IsNullOrEmpty(_MountDriveLetter))
+                {
+                    return _MountDriveLetter;
+                }
+                else
+                    return _props.SnapshotDeviceObject;
+            }
+        }
+
+        public void Dispose()
+        {
+
+            Dispose(true);
+            GC.SuppressFinalize(this); 
+            
+            /*
+            // VSS step 9: Delete the snapshot (using the Exposed Snapshot name)
+            foreach (VssSnapshotProperties prop in _backup.QuerySnapshots())
+            {
+                if (prop.ExposedName == @"L:\")
+                {
+                    Console.WriteLine("prop.ExposedNam Found!");
+                    _backup.DeleteSnapshot(prop.SnapshotId, true);
+                }
+            }
+             */ 
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                // Free any other managed objects here.
+                //
+                
+            }
+
+            // Free any unmanaged objects here.
+            //
+            try {Delete();} catch {}
+            disposed = true;
+        }
+
+        ~Snapshot()
+        {
+            Dispose(false);
+        }
+
+        void Delete()
+        {
+            logger.Info("Deleting snapshot set");
+            _backup.DeleteSnapshotSet(_setGuid, false);
+        }
+    }
 }

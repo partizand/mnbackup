@@ -167,18 +167,20 @@ namespace mnBackupLib
                     logger.Info("Shadow copy using");
                     try
                     {
-                        using (VssBackup vss = new VssBackup())
+                        
+                        using (Snapshot vss = new Snapshot(Path.GetPathRoot(job.Source), "L:"))
                         {
-                            logger.Info("Creating shadow copy");
-                            vss.Setup(Path.GetPathRoot(job.Source));
-
+                            //logger.Info("Creating shadow copy");
+                            //vss.Setup(Path.GetPathRoot(job.Source),"L:");
+                            vss.DoSnapshotSet();
+                            
                             string[] ShadowFiles = vss.GetSnapshotPath(files);
 
                             // Here we use the AlphaFS library to make the copy.
                             //Alphaleonis.Win32.Filesystem.File.Copy(snap_path, backup_path);
                             
                             sb2 = DoFiles(job, FullArhName, ShadowFiles);
-                            logger.Info("Deleting shadow copy");
+                            //logger.Info("Deleting shadow copy");
                         }
                     }
                     catch (Exception e)

@@ -44,7 +44,6 @@ namespace mnBackupLib
 
             try
             {
-                
                 cmp.CompressFiles(ArhFileName, files);
                 return true;
             }
