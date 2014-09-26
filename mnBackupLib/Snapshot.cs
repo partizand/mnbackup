@@ -204,7 +204,7 @@ namespace mnBackupLib
 
             // Free any unmanaged objects here.
             //
-            try {Delete();} catch {}
+            Delete();
             disposed = true;
         }
 
@@ -215,8 +215,15 @@ namespace mnBackupLib
 
         void Delete()
         {
-            logger.Info("Deleting snapshot set");
-            _backup.DeleteSnapshotSet(_setGuid, false);
+            try
+            {
+                logger.Info("Deleting snapshot set");
+                _backup.DeleteSnapshotSet(_setGuid, false);
+            }
+            catch (Exception e)
+            {
+                logger.Error("Erorr deleting snapshot {0}", e.Message);
+            }
         }
     }
 }
