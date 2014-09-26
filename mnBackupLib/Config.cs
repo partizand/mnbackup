@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Configuration;
+using CommandLine;
 
 //using CommandLine;
 //using CommandLine.Text;
@@ -66,8 +67,27 @@ namespace mnBackupLib
             
             // Менять в рантайме так:
             //config.AppSettings.Settings["CurrentPromoId"].Value = promo_id.ToString();
-            
 
+            // Все ключи конфигурации
+            string[] allkeys = conf.AppSettings.Settings.AllKeys;
+            System.Reflection.PropertyInfo[] props=options.GetType().GetProperties();
+
+            foreach (string key in allkeys)
+            {
+                // Ищем свойство
+                System.Reflection.PropertyInfo prop=props.FirstOrDefault(obj => String.Compare(obj.Name, key, true) == 0);
+                if (prop != null)
+                {
+                    var value=prop.GetValue(null,null);
+                    if (value != null)
+                    {
+                        
+                        string str=Properties.Settings.Default.TaskFileName;
+                        //ConfigurationManager. .AppSettings["t"].
+                        //conf.AppSettings.Settings[key]. Value = prop.GetValue(null, null);
+                    }
+                }
+            }
 
             if (!String.IsNullOrEmpty(options.RunOpt.TaskFile))
             {
@@ -79,7 +99,17 @@ namespace mnBackupLib
         public var GetValue(string Key)
         {
             // DefaultTaskFileName
+            
             return conf.AppSettings.Settings[Key];
         }
+        public T Get<T>(string key)
+        {
+            var appSetting = ConfigurationManager.AppSettings[key];
+            if (String.IsNullOrWhiteSpace(appSetting)) throw new AppSettingNotFoundException(key);
+
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            return (T)(converter.ConvertFromInvariantString(appSetting));
+        }
+
     }
 }
