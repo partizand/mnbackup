@@ -95,7 +95,7 @@ namespace mnBackupLib
 
     public class TaskSubOptions
     {
-        [Option('s', "source", MetaValue = "Dir", Required = true, HelpText = "Source dir")]
+        [Option('s', "source", MetaValue = "Dir", Required = true, HelpText = "Source dirs delimeted ;")]
         public string Source { get; set; }
 
         [Option('d', "dest", MetaValue = "Dir", Required = true, HelpText = "Destination dir")]

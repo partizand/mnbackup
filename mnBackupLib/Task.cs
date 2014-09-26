@@ -45,8 +45,15 @@ namespace mnBackupLib
         /// Каталог источник
         /// </summary>
         [DataMember]
-        public string Source { get; set; }
+        public string[] Source { get { return _Source; } }
+        //public string[] Source { get; set; }
+        private string[] _Source;
 
+        /// <summary>
+        /// Список дисков источников (для теневого копирования)
+        /// </summary>
+        public string[] SourceVolumes { get { return _SourceVolumes; } }
+        private string[] _SourceVolumes;
         /// <summary>
         /// Каталог приемник
         /// </summary>
@@ -72,7 +79,7 @@ namespace mnBackupLib
         {
             //Enabled = true;
             NameTask = nameTask;
-            Source = source;
+            SetSource(source);
             Destination = destination;
             Init();
         }
@@ -80,7 +87,8 @@ namespace mnBackupLib
         {
             Init();
             this.NameTask = "CmdTask";
-            this.Source = taskOptions.Source;
+            SetSource(taskOptions.Source);
+            //this.Source = FileManage.ConvertToArray(taskOptions.Source);
             this.Destination = taskOptions.Destination;
             this.Shadow = taskOptions.Shadow;
             this.Plan.Type = taskOptions.typeBackup;
@@ -98,7 +106,9 @@ namespace mnBackupLib
             Plan = new BackupPlan();
             SourceFilter = new FileFilter();
             ArhParam = new CompressParam();
+            
         }
+        
 
         /// <summary>
         /// Возвращает имя файла манифеста
@@ -109,6 +119,25 @@ namespace mnBackupLib
             string manifestFile = Path.Combine(Destination, "manifest"+GetPrefix()+".json");
             
             return manifestFile;
+        }
+        /// <summary>
+        /// Задает источник для копирования из каталогов разделенных ;
+        /// </summary>
+        /// <param name="sources">Список каталогов источника разделенных ;</param>
+        private void SetSource(string sources)
+        {
+            this._Source = FileManage.ConvertToArray(sources);
+            _SourceVolumes = GetSourceVolumes();
+        }
+
+        /// <summary>
+        /// Задает источник для копирования из каталогов разделенных ;
+        /// </summary>
+        /// <param name="sources">Список каталогов источника разделенных ;</param>
+        private void SetSource(string[] sources)
+        {
+            this._Source = sources;
+            _SourceVolumes = GetSourceVolumes();
         }
 
         /// <summary>
@@ -150,22 +179,44 @@ namespace mnBackupLib
         public string[] GetFiles()
         {
             List<string> files = new List<string>();
-            // Перебрать все файлы в каталоге
-            string dir = Source;
-            SearchOption rec = SourceFilter.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-            string[] allFiles = Directory.GetFiles(dir, "*", rec);
-            foreach (string curFile in allFiles)
+            // Перебрать все каталоги
+            foreach (string dir in Source)
             {
-                if (SourceFilter.isIn(curFile))
+                // Перебрать все файлы в каталоге
+                
+                SearchOption rec = SourceFilter.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+                string[] allFiles = Directory.GetFiles(dir, "*", rec);
+                foreach (string curFile in allFiles)
                 {
-                    files.Add(curFile);
+                    if (SourceFilter.isIn(curFile))
+                    {
+                        files.Add(curFile);
+                    }
                 }
             }
 
             return files.ToArray();
 
         }
-        
+
+        /// <summary>
+        /// Возвращает список дисков в каталогах источниках
+        /// </summary>
+        /// <returns></returns>
+        private string[] GetSourceVolumes()
+        {
+            string volume;
+            List<string> lst = new List<string>();
+            foreach (string dir in Source)
+            {
+                volume=Path.GetPathRoot(dir).ToUpper();
+                if (!lst.Exists(obj => obj.CompareTo(volume) == 0))
+                {
+                    lst.Add(volume);
+                }
+            }
+            return lst.ToArray();
+        }
 
       
     }

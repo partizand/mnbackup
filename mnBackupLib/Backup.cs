@@ -110,12 +110,14 @@ namespace mnBackupLib
             
             
             // Проверка существования каталогов
-            if (!Directory.Exists(job.Source))
+            if (CheckDir(job.Source) == StatusBackup.Fatal)
             {
-                logger.Error("Каталог источника не существует {0}", job.Source);
+                logger.Error("Source dirs not founded");
                 logger.Error("Task finished with status {0}", si.Status);
                 return StatusBackup.Fatal;
             }
+            
+            
 
             if (!Directory.Exists(job.Destination))
             {
@@ -167,8 +169,18 @@ namespace mnBackupLib
                     logger.Info("Shadow copy using");
                     try
                     {
-                        
-                        using (Snapshot vss = new Snapshot(Path.GetPathRoot(job.Source), "L:"))
+                        if (job.SourceVolumes.Length!=1) // в источниках больше одного тома, теневое копирование на это не рассчитано
+                        {
+                            logger.Error("Too many volumes to shadow, use only one (or noo volumes, check source)");
+                            return StatusBackup.Fatal;
+                        }
+                        string freeLetter = FileManage.Volumes.GetFreeLetter();
+                        if (String.IsNullOrEmpty(freeLetter))
+                        {
+                            logger.Error("No free letter to map snapshot");
+                            return StatusBackup.Fatal;
+                        }
+                        using (Snapshot vss = new Snapshot(job.SourceVolumes[0], freeLetter))
                         {
                             //logger.Info("Creating shadow copy");
                             //vss.Setup(Path.GetPathRoot(job.Source),"L:");
@@ -238,6 +250,27 @@ namespace mnBackupLib
             }
             return si.Status;
             
+        }
+
+        private StatusBackup CheckDir(string[] dirs)
+        {
+            if (dirs.Length < 1) return StatusBackup.Fatal;
+            StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
+            int i = 0;
+            foreach (string dir in dirs)
+            {
+                // Проверка существования каталогов
+                if (!Directory.Exists(dir))
+                {
+                    si.UpdateStatus(StatusBackup.Error);
+                    logger.Error("Directory does not exist {0}", dir);
+                    i++;
+                }
+            }
+            if (i == dirs.Length) si.UpdateStatus(StatusBackup.Fatal); // Ни одного каталога нет
+            
+            return si.Status;
+
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,94 @@ namespace mnBackupLib
     public class FileManage
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+
+
+        public class Volumes
+        {
+            /// <summary>
+            /// Возвращает первый свободный диск в системе
+            /// </summary>
+            /// <param name="useFloppyLetter">использовать буквы дисков А: и В:</param>
+            /// <returns></returns>
+            public static string GetFreeLetter(bool useFloppyLetter)
+            {
+                int start=65; //A letter
+                if (!useFloppyLetter) start = start + 2;
+                ArrayList driveLetters = new ArrayList(26); // Allocate space for alphabet
+                for (int i = start; i < 91; i++) // increment from ASCII values for A-Z
+                {
+                    driveLetters.Add(Convert.ToChar(i)); // Add uppercase letters to possible drive letters
+                }
+
+                foreach (string drive in Directory.GetLogicalDrives())
+                {
+                    driveLetters.Remove(drive[0]); // removed used drive letters from possible drive letters
+                }
+                if (driveLetters.Count > 0) return driveLetters[0].ToString()+":";
+                else return "";
+                
+            }
+            /// <summary>
+            /// Возвращает первый свободный диск в системе, без использования дисков А: и В:
+            /// </summary>
+            /// <returns></returns>
+            public static string GetFreeLetter()
+            {
+                return GetFreeLetter(false);
+            }
+            /// <summary>
+            /// Возвращает prefLetter если такого диска нет или первый свободный диск
+            /// </summary>
+            /// <param name="prefLetter">какой диск назначить свободным, если его нет в системе</param>
+            /// <returns>Свбодный диск в системе или "" если все занято</returns>
+            public static string GetFreeLetter(string prefLetter)
+            {
+                if (!String.IsNullOrEmpty(prefLetter))
+                {
+                    if (!IsVolumeExist(prefLetter)) return prefLetter;
+
+                }
+                // просто получить первый свободный диск
+                return GetFreeLetter();
+
+            }
+            /// <summary>
+            /// Проверяет существует ли такой диск в системе
+            /// </summary>
+            /// <param name="letter">Проверяемый диск (например "d:\\")</param>
+            /// <returns></returns>
+            public static bool IsVolumeExist(string letter)
+            {
+                if (String.IsNullOrEmpty(letter)) return true; // Неправльный диск
+                
+                letter = letter.ToUpper();
+                char let=letter[0];
+                foreach (char drive in GetVolumes())
+                {
+                    if (let == drive)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+                
+            }
+            /// <summary>
+            /// Возвращает список занятых букв (без : и \\) в системе
+            /// </summary>
+            /// <returns></returns>
+            private static char[] GetVolumes()
+            {
+                List<char> drives = new List<char>();
+                foreach (string drive in Directory.GetLogicalDrives())
+                {
+                    string let=drive.ToUpper();
+                    drives.Add(let[0]);
+                }
+                return drives.ToArray();
+            }
+
+        }
 
         /// <summary>
         /// безопасное удаление файла
@@ -105,6 +194,23 @@ namespace mnBackupLib
                 ret = ret & suc;
             }
             return ret;
+        }
+        /// <summary>
+        /// Преобразовывает список каталогов разделенных ; в массив
+        /// </summary>
+        /// <param name="delimDirs">список каталогов разделенных ; или ,</param>
+        /// <returns>массив с каталогами</returns>
+        public static string[] ConvertToArray(string delimDirs)
+        {
+            char[] delims = { ';', ',' };
+            string[] lst;
+            lst = delimDirs.Split(delims, StringSplitOptions.RemoveEmptyEntries);
+            int i;
+            for (i = 0; i < lst.Length; i++)
+            {
+                lst[i]=lst[i].Trim();
+            }
+            return lst;
         }
     }
 }

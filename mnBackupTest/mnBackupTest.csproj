@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileFilterTest.cs" />
+    <Compile Include="FileManageTest.cs" />
     <Compile Include="ManifestTest.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="PeriodTest.cs" />
