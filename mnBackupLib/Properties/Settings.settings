@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="mnBackupLib.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="DefaultTaskFileName" Type="System.String" Scope="Application">
+    <Setting Name="TaskFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">jobs.json</Value>
     </Setting>
   </Settings>

@@ -27,7 +27,8 @@ namespace mnBackupLib
         [VerbOption("run", HelpText = "Run task from file.")]
         public RunSubOptions RunOpt { get; set; }
 
-        
+        [Option("optimize", HelpText = "Optimize for Speed|Accuracy.")]
+        public OptimizeFor Optimization { get; set; }
 
 
 
