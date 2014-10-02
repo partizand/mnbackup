@@ -27,8 +27,11 @@ namespace mnBackupLib
         [VerbOption("run", HelpText = "Run task from file.")]
         public RunSubOptions RunOpt { get; set; }
 
-        [Option("optimize", HelpText = "Optimize for Speed|Accuracy.")]
-        public OptimizeFor Optimization { get; set; }
+        [Option("MailHost", HelpText = "Mail server name for send reports")]
+        public string MailHost { get; set; }
+
+        [Option("MailAddr", HelpText = "Email to send reports")]
+        public string MailAddr { get; set; }
 
 
 

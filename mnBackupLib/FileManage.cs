@@ -15,11 +15,13 @@ namespace mnBackupLib
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-
+        /// <summary>
+        /// Работа с дисками
+        /// </summary>
         public class Volumes
         {
             /// <summary>
-            /// Возвращает первый свободный диск в системе
+            /// Возвращает первый свободный диск в системе в виде L:
             /// </summary>
             /// <param name="useFloppyLetter">использовать буквы дисков А: и В:</param>
             /// <returns></returns>
@@ -42,7 +44,7 @@ namespace mnBackupLib
                 
             }
             /// <summary>
-            /// Возвращает первый свободный диск в системе, без использования дисков А: и В:
+            /// Возвращает первый свободный диск в системе в виде L:, без использования дисков А: и В:
             /// </summary>
             /// <returns></returns>
             public static string GetFreeLetter()
@@ -52,7 +54,7 @@ namespace mnBackupLib
             /// <summary>
             /// Возвращает prefLetter если такого диска нет или первый свободный диск
             /// </summary>
-            /// <param name="prefLetter">какой диск назначить свободным, если его нет в системе</param>
+            /// <param name="prefLetter">какой диск назначить свободным, если его нет в системе (может быть в любой форме, проверяется только буква)</param>
             /// <returns>Свбодный диск в системе или "" если все занято</returns>
             public static string GetFreeLetter(string prefLetter)
             {
@@ -68,7 +70,7 @@ namespace mnBackupLib
             /// <summary>
             /// Проверяет существует ли такой диск в системе
             /// </summary>
-            /// <param name="letter">Проверяемый диск (например "d:\\")</param>
+            /// <param name="letter">Проверяемый диск может быть в любой форме, проверяется только буква (например: d:\\ или d: или d)</param>
             /// <returns></returns>
             public static bool IsVolumeExist(string letter)
             {

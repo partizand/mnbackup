@@ -5,5 +5,11 @@
     <Setting Name="TaskFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">jobs.json</Value>
     </Setting>
+    <Setting Name="MailHost" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="MailAddr" Type="System.String" Scope="User">
+      <Value Profile="(Default)">user@localhost</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

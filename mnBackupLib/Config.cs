@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Configuration;
 using CommandLine;
+using Nini.Config;
 
 //using CommandLine;
 //using CommandLine.Text;
@@ -29,6 +30,9 @@ namespace mnBackupLib
         public const string DEFAULT_FULL_STORE = "1m";
 
         Configuration conf;
+
+        IConfigSource NConf;
+
 
         /// <summary>
         /// Файл с заданиями
@@ -59,6 +63,12 @@ namespace mnBackupLib
 
         private void Init()
         {
+            IConfigSource source = new IniConfigSource("mnBackup.ini");
+
+            source.Configs[0].
+
+            
+
             conf = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         }
 
@@ -83,8 +93,9 @@ namespace mnBackupLib
                     {
                         
                         string str=Properties.Settings.Default.TaskFileName;
+                        
                         //ConfigurationManager. .AppSettings["t"].
-                        //conf.AppSettings.Settings[key]. Value = prop.GetValue(null, null);
+                        conf.AppSettings.Settings[key].Value = prop.GetValue(null, null);
                     }
                 }
             }

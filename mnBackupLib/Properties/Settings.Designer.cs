@@ -31,5 +31,29 @@ namespace mnBackupLib.Properties {
                 return ((string)(this["TaskFileName"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string MailHost {
+            get {
+                return ((string)(this["MailHost"]));
+            }
+            set {
+                this["MailHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("user@localhost")]
+        public string MailAddr {
+            get {
+                return ((string)(this["MailAddr"]));
+            }
+            set {
+                this["MailAddr"] = value;
+            }
+        }
     }
 }
