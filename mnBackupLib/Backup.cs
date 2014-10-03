@@ -28,7 +28,7 @@ namespace mnBackupLib
 
         private List<Task> _tasks = new List<Task>();
 
-        public Config Conf;
+        //public Config Conf;
 
         /// <summary>
         /// Количество заданий
@@ -40,15 +40,20 @@ namespace mnBackupLib
 
         public Backup()
         {
-            Conf = new Config();
-        }
-
-        public Backup(Options options)
-        {
-            Conf = new Config();
-            Conf.MergeOptions(options);
+            //Conf = new Config();
+            //Period per = new Period("1w");
+            
+            
             
         }
+        /*
+        public Backup(CommonSubOptions options)
+        {
+            //Conf = new Config();
+            Config.Instance.MergeOptions(options);
+            
+        }
+          */
         /// <summary>
         /// Добавить задание в список
         /// </summary>
@@ -57,7 +62,8 @@ namespace mnBackupLib
         {
             _tasks.Add(job);
         }
-
+        
+        
         /// <summary>
         /// Прочитать задания из файла. Задания добавляются к текущим. Тип определяется по расширению. По умолчанию JSON
         /// </summary>
@@ -176,7 +182,7 @@ namespace mnBackupLib
                             logger.Error("Too many volumes to shadow, use only one (or noo volumes, check source)");
                             return StatusBackup.Fatal;
                         }
-                        string freeLetter = FileManage.Volumes.GetFreeLetter();
+                        string freeLetter = FileManage.Volumes.GetFreeLetter(Config.Instance.mnConfig.ExposeVolume);
                         if (String.IsNullOrEmpty(freeLetter))
                         {
                             logger.Error("No free letter to map snapshot");

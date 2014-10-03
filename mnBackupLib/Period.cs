@@ -62,24 +62,128 @@ namespace mnBackupLib
         public Period(string str)
         {
             
-            char[] Numbers = {'0','1', '2','3','4','5','6','7','8','9' };
+            ParseI(str, out intervalName, out intervalValue);
+            
+        }
+
+        public override string ToString()
+        {
+            return intervalValue.ToString() + intervalName.ToString().Substring(0,1);
+        }
+
+        private static bool ParseI(string str, out PeriodName periodName,out int value)
+        {
+            value = 1;
+            periodName = PeriodName.Day;
+            bool ret = true;
+            char[] Numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
             string Str = str.ToLower().Trim();
             int lastNumIndex = Str.LastIndexOfAny(Numbers);
-            
-            intervalValue = 1;
-            intervalName = PeriodName.Day;
+
+            //p.intervalValue = 1;
+            //p.intervalName = PeriodName.Day;
 
             if (lastNumIndex > -1) // Цифры есть
             {
                 string strNum = Str.Substring(0, lastNumIndex + 1);
-                int.TryParse(strNum, out intervalValue);
+                ret=int.TryParse(strNum, out value);
             }
-            
 
-            if (Str.EndsWith("d") || Str.EndsWith("day")) intervalName = PeriodName.Day;
-            if (Str.EndsWith("w") || Str.EndsWith("week")) intervalName = PeriodName.Week;
-            if (Str.EndsWith("m") || Str.EndsWith("month")) intervalName = PeriodName.Month;
+
+            if (Str.EndsWith("d") || Str.EndsWith("day")) periodName = PeriodName.Day;
+            if (Str.EndsWith("w") || Str.EndsWith("week")) periodName = PeriodName.Week;
+            if (Str.EndsWith("m") || Str.EndsWith("month")) periodName = PeriodName.Month;
+            return ret;
         }
+
+        public static Period Parse(string str)
+        {
+            int val;
+            PeriodName per;
+            ParseI(str, out per, out val);
+            Period p = new Period(per, val);
+            return p;
+            
+        }
+
+        public static bool TryParse(string str,out Period p)
+        {
+            p = new Period(PeriodName.Day);
+            try
+            {
+                p = Parse(str);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
+        #region Equals ovveride
+
+        public override bool Equals(System.Object obj)
+        {
+            // If parameter is null return false.
+            if (obj == null)
+            {
+                return false;
+            }
+
+            // If parameter cannot be cast to Point return false.
+            Period p = obj as Period;
+            if ((System.Object)p == null)
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return (intervalName == p.intervalName) && (intervalValue == p.intervalValue);
+        }
+
+        public bool Equals(Period p)
+        {
+            // If parameter is null return false:
+            if ((object)p == null)
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return (intervalName == p.intervalName) && (intervalValue == p.intervalValue);
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)intervalName^intervalValue;
+        }
+
+        public static bool operator ==(Period a, Period b)
+        {
+            // If both are null, or both are same instance, return true.
+            if (System.Object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            // If one is null, but not both, return false.
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return a.IntervalName== b.IntervalName && a.IntervalValue == b.IntervalValue;
+        }
+
+        public static bool operator !=(Period a, Period b)
+        {
+            return !(a == b);
+        }
+
+
+        #endregion
         /// <summary>
         /// Прошел ли интервал с указанной даты
         /// </summary>

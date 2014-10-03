@@ -92,7 +92,13 @@ namespace mnBackupLib
             this.Destination = taskOptions.Destination;
             this.Shadow = taskOptions.Shadow;
             this.Plan.Type = taskOptions.typeBackup;
-            this.Plan.Interval = new Period(taskOptions.Interval);
+            if (taskOptions.Interval == null)
+            {
+                this.Plan.Interval = new Period(Config.Instance.mnConfig.Interval);// new Period("1w");
+            }
+            else
+                this.Plan.Interval = taskOptions.Interval;
+
             this.Plan.Store = new Period(taskOptions.Store);
 
         }

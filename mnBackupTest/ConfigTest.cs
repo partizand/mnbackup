@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using mnBackupLib;
 using NUnit.Framework;
+using System.Configuration;
 
 namespace mnBackupTest
 {
@@ -13,14 +14,17 @@ namespace mnBackupTest
         [Test]
         public void MergeOptionsTest()
         {
-            Config conf = new Config();
-            Assert.AreEqual("L:", conf.mnConfig.ExposeVolume);
+            //Config conf = new Config();
+            Assert.AreEqual("L:", Config.Instance.mnConfig.ExposeVolume);
+            Period EtalonPer = new Period("2w");
+            Period per = new Period(Config.Instance.mnConfig.Interval);
+            Assert.AreEqual(EtalonPer, per, "Default interval");
 
             Options opt = new Options();
-            opt.ExposeVolume = "Z:";
+            opt.TaskOpt.ExposeVolume = "Z:";
             //Config conf = new Config(opt);
-            conf.MergeOptions(opt);
-            Assert.AreEqual("Z:", conf.mnConfig.ExposeVolume);
+            Config.Instance.MergeOptions(opt.TaskOpt);
+            Assert.AreEqual("Z:", Config.Instance.mnConfig.ExposeVolume, "Слияение с Options");
         }
     }
 }

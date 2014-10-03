@@ -64,6 +64,8 @@ namespace mnBackup
             if (invokedVerb == "task") // запуск одного задания из командной строки
             {
                 var commitSubOptions = (TaskSubOptions)invokedVerbInstance;
+                
+                Config.Instance.MergeOptions(commitSubOptions);
                 //Console.WriteLine("Source is " + commitSubOptions.Source);
                 //Console.WriteLine("Source2 is " + options.TaskOpt.Source);
 
@@ -76,6 +78,7 @@ namespace mnBackup
             if (invokedVerb == "run") // запуск заданий из файла
             {
                 var commitSubOptions = (RunSubOptions)invokedVerbInstance;
+                Config.Instance.MergeOptions(commitSubOptions);
                 bak.Read(commitSubOptions.TaskFile);
                 bak.Start();
             }

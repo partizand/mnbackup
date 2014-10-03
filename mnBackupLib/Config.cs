@@ -14,7 +14,7 @@ namespace mnBackupLib
     /// <summary>
     /// Конфигурация
     /// </summary>
-    public class Config
+    public class Config:Singleton<Config>
     {
         /// <summary>
         /// Имя файла с заданиями по умолчанию
@@ -42,12 +42,16 @@ namespace mnBackupLib
         /// </summary>
         //public Options options { get; set; }
 
+        /// Вызовет защищенный конструктор класса Singleton
+        private Config() { Init(); }
+        /*
         public Config()
         {
             Init();
             //options = new Options();
             
         }
+         */ 
         /*
         public Config(Options opt)
         {
@@ -70,13 +74,6 @@ namespace mnBackupLib
 
             conf = ConfigurationManager.OpenMappedExeConfiguration(emap, ConfigurationUserLevel.None); // OpenExeConfiguration( OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            mnBackupLib.Properties.Settings appSet;
-            
-
-            appSet = conf.GetSection("applicationSettings") as mnBackupLib.Properties.Settings;
-
-            appSet.
-
             _mnConfig = conf.GetSection("mnBackup") as  ConfSection;
 
             //ConfSection section = ConfigurationManager.GetSection("example") as ConfSection;
@@ -92,24 +89,31 @@ namespace mnBackupLib
         
 
 
-        public void MergeOptions(Options options)
+        public void MergeOptions(CommonSubOptions options)
         {
             
             // Менять в рантайме так:
             //config.AppSettings.Settings["CurrentPromoId"].Value = promo_id.ToString();
 
             // Все ключи конфигурации
-            System.Reflection.PropertyInfo[] propsXML = _mnConfig.SectionInformation.GetType().GetProperties();
+            System.Reflection.PropertyInfo[] propsXML = _mnConfig.GetType().GetProperties();// SectionInformation.GetType().GetProperties();
             System.Reflection.PropertyInfo[] propsOpt=options.GetType().GetProperties();
 
-            
-            foreach (System.Reflection.PropertyInfo propXML in propsXML)
+            int i;
+
+            for (i=0;i<propsXML.Length;i++)
             {
+            
+            
                 // Ищем свойство
-                System.Reflection.PropertyInfo propOpt = propsOpt.FirstOrDefault(obj => String.Compare(obj.Name, propXML.Name, true) == 0);
+                System.Reflection.PropertyInfo propOpt = propsOpt.FirstOrDefault(obj => String.Compare(obj.Name, propsXML[i].Name, true) == 0);
                 if (propOpt != null)
                 {
-                    propXML.SetValue(null,propOpt.GetValue(null,null),null);
+                    var obj = propOpt.GetValue(options, null);
+                    if (obj != null)
+                    {
+                        propsXML[i].SetValue(_mnConfig, obj, null);
+                    }
                     /*
                     var value=prop.GetValue(null,null);
                     if (value != null)
