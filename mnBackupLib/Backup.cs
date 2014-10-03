@@ -75,6 +75,14 @@ namespace mnBackupLib
         }
 
         /// <summary>
+        /// Чтение файла задания по умолчанию или заданного в параметрах запуска
+        /// </summary>
+        public void Read()
+        {
+            Read(Config.Instance.mnConfig.TaskFile);
+        }
+
+        /// <summary>
         /// Записывает список заданий в файл. Тип определяется по расширению. По умолчанию JSON
         /// </summary>
         /// <param name="FileName"></param>

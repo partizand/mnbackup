@@ -79,7 +79,7 @@ namespace mnBackup
             {
                 var commitSubOptions = (RunSubOptions)invokedVerbInstance;
                 Config.Instance.MergeOptions(commitSubOptions);
-                bak.Read(commitSubOptions.TaskFile);
+                bak.Read();
                 bak.Start();
             }
             

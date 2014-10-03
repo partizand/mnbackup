@@ -86,7 +86,16 @@ namespace mnBackupLib
         public Task(TaskSubOptions taskOptions)
         {
             Init();
-            this.NameTask = "CmdTask";
+
+            if (!String.IsNullOrEmpty(taskOptions.Prefix))
+            {
+                this.NameTask = taskOptions.Prefix;
+                this.Prefix = taskOptions.Prefix;
+            }
+            else
+            {
+                this.NameTask = "CmdTask";
+            }
             SetSource(taskOptions.Source);
             //this.Source = FileManage.ConvertToArray(taskOptions.Source);
             this.Destination = taskOptions.Destination;
@@ -94,12 +103,20 @@ namespace mnBackupLib
             this.Plan.Type = taskOptions.typeBackup;
             if (taskOptions.Interval == null)
             {
-                this.Plan.Interval = new Period(Config.Instance.mnConfig.Interval);// new Period("1w");
+                this.Plan.Interval = new Period(Config.Instance.mnConfig.Interval);
             }
             else
-                this.Plan.Interval = taskOptions.Interval;
-
-            this.Plan.Store = new Period(taskOptions.Store);
+            {
+                this.Plan.Interval = new Period(taskOptions.Interval);
+            }
+            if (String.IsNullOrEmpty(taskOptions.Store))
+            {
+                this.Plan.Store = new Period(Config.Instance.mnConfig.Store);
+            }
+            else
+            {
+                this.Plan.Store = new Period(taskOptions.Store);
+            }
 
         }
         /// <summary>

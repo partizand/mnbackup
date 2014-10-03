@@ -82,13 +82,16 @@ namespace mnBackupLib
         [Option('d', "dest", MetaValue = "Dir", Required = true, HelpText = "Destination dir")]
         public string Destination { get; set; }
 
+        [Option("prefix", MetaValue = "name", HelpText = "Prefix or name of task")]
+        public string Prefix { get; set; }
+
         [Option('t', "type", DefaultValue = TypeBackup.Full, HelpText = "Type backup Full|Differential")]
         public TypeBackup typeBackup { get; set; }
 
         [Option("Interval", MetaValue = "period", HelpText = "Period in days between full backup for diff backup. May use 1d,1w,1m or number days")]
-        public Period Interval { get; set; }
+        public string Interval { get; set; }
 
-        [Option("Store", MetaValue = "period", DefaultValue = Config.DEFAULT_FULL_STORE, HelpText = "Period in days to store full backups. May use 1d,1w,1m or number days. 0 - store all backups")]
+        [Option("Store", MetaValue = "period", HelpText = "Period in days to store full backups. May use 1d,1w,1m or number days. 0 - store all backups")]
         public string Store { get; set; }
 
         [Option("shadow",  HelpText = "Use volume shadow copying.")]
