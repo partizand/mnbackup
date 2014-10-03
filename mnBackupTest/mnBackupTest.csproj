@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigTest.cs" />
     <Compile Include="FileFilterTest.cs" />
     <Compile Include="FileManageTest.cs" />
     <Compile Include="ManifestTest.cs" />

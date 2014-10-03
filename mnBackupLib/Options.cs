@@ -27,6 +27,9 @@ namespace mnBackupLib
         [VerbOption("run", HelpText = "Run task from file.")]
         public RunSubOptions RunOpt { get; set; }
 
+        [Option("ExposeVolume", HelpText = "Volume letter to mount snapshot")]
+        public string ExposeVolume { get; set; }
+
         [Option("MailHost", HelpText = "Mail server name for send reports")]
         public string MailHost { get; set; }
 

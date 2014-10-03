@@ -45,7 +45,9 @@ namespace mnBackupLib
 
         public Backup(Options options)
         {
-            Conf = new Config(options);
+            Conf = new Config();
+            Conf.MergeOptions(options);
+            
         }
         /// <summary>
         /// Добавить задание в список

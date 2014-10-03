@@ -101,6 +101,7 @@
     <Compile Include="Compressor.cs" />
     <Compile Include="CompressParam.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="ConfSection.cs" />
     <Compile Include="FileFilter.cs" />
     <Compile Include="FileManage.cs" />
     <Compile Include="Options.cs" />
@@ -120,6 +121,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="mnBackup.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
