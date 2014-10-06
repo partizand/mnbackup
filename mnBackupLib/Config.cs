@@ -33,62 +33,38 @@ namespace mnBackupLib
 
         ConfSection _mnConfig;
 
-        //IConfigSource NConf;
-
-
-        
-        /// <summary>
-        /// Опции командной строки
-        /// </summary>
-        //public Options options { get; set; }
-
         /// Вызовет защищенный конструктор класса Singleton
         private Config() { Init(); }
-        /*
-        public Config()
-        {
-            Init();
-            //options = new Options();
-            
-        }
-         */ 
-        /*
-        public Config(Options opt)
-        {
-            Init();
-            options = opt;
-            ReadOptions();
-        }
-        */
+        
+        /// <summary>
+        /// Чтение конфигурации из файла
+        /// </summary>
         private void Init()
         {
-            //IConfigSource source = new IniConfigSource("mnBackup.ini");
-
-            //source.Configs[0].
-
+            
             Configuration conf;
 
             ExeConfigurationFileMap emap=new ExeConfigurationFileMap();
             
             emap.ExeConfigFilename="mnBackup.config";
 
-            conf = ConfigurationManager.OpenMappedExeConfiguration(emap, ConfigurationUserLevel.None); // OpenExeConfiguration( OpenExeConfiguration(ConfigurationUserLevel.None);
+            conf = ConfigurationManager.OpenMappedExeConfiguration(emap, ConfigurationUserLevel.None); 
 
             _mnConfig = conf.GetSection("mnBackup") as  ConfSection;
 
-            //ConfSection section = ConfigurationManager.GetSection("example") as ConfSection;
+            
             if (_mnConfig == null)
             {
                 _mnConfig = new ConfSection();
                 
             }
 
-            //conf.AppSettings.Settings.
+            
         }
-
-        
-
-
+        /// <summary>
+        /// Перекрыть настройки опциями командной строки
+        /// </summary>
+        /// <param name="options"></param>
         public void MergeOptions(CommonSubOptions options)
         {
             
@@ -114,27 +90,11 @@ namespace mnBackupLib
                     {
                         propsXML[i].SetValue(_mnConfig, obj, null);
                     }
-                    /*
-                    var value=prop.GetValue(null,null);
-                    if (value != null)
-                    {
-                        
-                        string str=Properties.Settings.Default.TaskFileName;
-                        
-                        //ConfigurationManager. .AppSettings["t"].
-                        conf.AppSettings.Settings[key].Value = prop.GetValue(null, null).ToString();
-                    }
-                     */ 
+                   
                 }
             }
 
-            /*
-            if (!String.IsNullOrEmpty(options.RunOpt.TaskFile))
-            {
-                conf.AppSettings.Settings["TaskFile"].Value = options.RunOpt.TaskFile;
-                //this._taskFileName = options.RunOpt.TaskFile;
-            }
-            */
+           
         }
 
         

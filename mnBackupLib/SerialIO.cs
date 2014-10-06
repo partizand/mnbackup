@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.IO;
+using NLog;
 
 namespace mnBackupLib
 {
@@ -57,6 +58,8 @@ namespace mnBackupLib
             }
             catch (Exception e)
             {
+                Logger logger = LogManager.GetCurrentClassLogger();
+                logger.Error("Error saving to JSON file {0}. Exception {1}", FileName, e.Message);
                 return false;
             }
         }
