@@ -167,18 +167,7 @@ namespace mnBackupLib
             if (files.Length > 0)
             {
 
-                //string FullArhName = Path.Combine(job.Destination, ArhName);
-
-                // Сжать файлы синхронно
-                /*
-                Compressor cmp = new Compressor(job.ArhParam);
-                bool suc = cmp.CompressFiles(FullArhName, files);
-
-                if (!suc)
-                {
-                    si.UpdateStatus(StatusBackup.Error);
-                }
-                */
+                
                 StatusBackup sb2 = StatusBackup.OK;
                 if (job.Shadow)
                 {

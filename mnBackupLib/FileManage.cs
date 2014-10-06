@@ -107,15 +107,24 @@ namespace mnBackupLib
         }
 
         /// <summary>
-        /// Возвращает список файлов архива по имени архива. Сейчас заглушка всегда возвращает один файл
+        /// Возвращает список файлов архива по имени архива, для получения всех томов архива
+        /// Файлы в каталоге уже должны существовать
+        /// Возвращает все файлы в каталоге FullArhName+*
         /// </summary>
         /// <param name="FullArhName"></param>
         /// <returns></returns>
         public static string[] GetArhFiles(string FullArhName)
         {
-            List<string> files = new List<string>();
-            files.Add(Path.GetFileName(FullArhName));
-            return files.ToArray();
+            string[] files;
+
+            files=Directory.GetFiles(Path.GetDirectoryName(FullArhName), Path.GetFileName(FullArhName) + "*");
+
+            int i;
+            for (i = 0; i < files.Length; i++) // Убираются длинные имена
+            {
+                files[i] = Path.GetFileName(files[i]); // оставляем только имя файла
+            }
+            return files;
 
         }
 
