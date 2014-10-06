@@ -17,23 +17,28 @@ namespace mnBackupTest
             DateTime today=DateTime.Today;
             
             DateTime dt=today.AddDays(-6);
-            BakEntryInfo bakEntry1 = new BakEntryInfo(dt,TypeBackup.Full, StatusBackup.OK, "ArhName1");
+            string[] arhName = { "ArhName1" };
+            BakEntryInfo bakEntry1 = new BakEntryInfo(dt, TypeBackup.Full, StatusBackup.OK, arhName);
             man.Add(bakEntry1);
             
+            arhName = new string[] { "ArhName2" };
             dt = today.AddDays(-5);
-            BakEntryInfo bakEntry2 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, "ArhName2");
+            BakEntryInfo bakEntry2 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
             man.Add(bakEntry2);
-            
+
+            arhName = new string[] { "ArhName3" };
             dt = today.AddDays(-4);
-            BakEntryInfo bakEntry3 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, "ArhName3");
+            BakEntryInfo bakEntry3 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
             man.Add(bakEntry3);
-            
+
+            arhName = new string[] { "ArhName4" };
             DateTime dtFull = today.AddDays(-3);
-            BakEntryInfo bakEntry4 = new BakEntryInfo(dtFull, TypeBackup.Full, StatusBackup.OK, "ArhName4");
+            BakEntryInfo bakEntry4 = new BakEntryInfo(dtFull, TypeBackup.Full, StatusBackup.OK, arhName);
             man.Add(bakEntry4);
-            
+
+            arhName = new string[] { "ArhName5" };
             dt = today.AddDays(-2);
-            BakEntryInfo bakEntry5 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, "ArhName5");
+            BakEntryInfo bakEntry5 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
             man.Add(bakEntry5);
 
             DateTime lastFull=man.GetLastFullDate();

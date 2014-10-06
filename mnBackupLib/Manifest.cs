@@ -12,14 +12,23 @@ namespace mnBackupLib
     /// </summary>
     public class Manifest
     {
-        
+
+        #region Properties
+
+
+        /// <summary>
+        /// Каталог с файлами бэкапа данного манифеста, расположение манифеста
+        /// </summary>
+        public string ManifestDir { get { return _ManifestDir; } }
+        /// <summary>
+        /// Каталог с файлами бэкапа данного манифеста, расположение манифеста private
+        /// </summary>
+        private string _ManifestDir;
         
         /// <summary>
         /// Записи о бэкапах
         /// </summary>
         List<BakEntryInfo> Lines;
-        
-
 
         /// <summary>
         /// Имя файла с манифестом
@@ -28,14 +37,19 @@ namespace mnBackupLib
         {
             get {return ManifestFile;}
         }
+        /// <summary>
+        /// Имя файла с манифестом private
+        /// </summary>
         private string ManifestFile;
+
+        #endregion
 
         public Manifest(string manifestFile)
         {
             ManifestFile = manifestFile;
+            _ManifestDir = Path.GetDirectoryName(manifestFile);
             
-            
-            Lines =  new List<BakEntryInfo>();
+            //Lines =  new List<BakEntryInfo>();
             Lines = SerialIO.Read<List<BakEntryInfo>>(ManifestFile);
             if (Lines == null) Lines = new List<BakEntryInfo>();
             

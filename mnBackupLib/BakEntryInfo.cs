@@ -40,35 +40,89 @@ namespace mnBackupLib
         /// Имя файла/каталога с бэкапом
         /// </summary>
         [DataMember]
-        public string BackupFileName
+        public string[] BackupFileNames
         { get; set; }
         
 
-        
-        public BakEntryInfo(DateTime dt,TypeBackup typeBackup, StatusBackup status,string backupFileName)
+        /// <summary>
+        /// Запись о информации с копированием
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="typeBackup"></param>
+        /// <param name="status"></param>
+        /// <param name="backupFileNames"></param>
+        public BakEntryInfo(DateTime dt,TypeBackup typeBackup, StatusBackup status,string[] backupFileNames)
         {
             this.BackupDate = dt;
             this.TypeBackup = typeBackup;
             this.Status = status;
-            this.BackupFileName = backupFileName;
+            BackupFileNames = new string[backupFileNames.Length];
+            backupFileNames.CopyTo(this.BackupFileNames,0);
+            //this.BackupFileNames. = new string[(backupFileNames)];
             
         }
-
-        public BakEntryInfo(TypeBackup typeBackup, StatusBackup status, string backupFileName)
+        /// <summary>
+        /// Создать запись о информации с копированием с текущей датой
+        /// </summary>
+        /// <param name="typeBackup"></param>
+        /// <param name="status"></param>
+        /// <param name="backupFileNames"></param>
+        public BakEntryInfo(TypeBackup typeBackup, StatusBackup status, string[] backupFileNames)
         {
             this.BackupDate = DateTime.Now;
             this.TypeBackup = typeBackup;
             this.Status = status;
-            this.BackupFileName = backupFileName;
+            BackupFileNames = new string[backupFileNames.Length];
+            backupFileNames.CopyTo(this.BackupFileNames, 0);
+            //this.BackupFileNames = new List<string>(backupFileNames);
 
         }
-        
+
+        #region Equals ovveride
+
         public int CompareTo(BakEntryInfo other)
         {
             
             return BackupDate.CompareTo(other.BackupDate);
         }
 
+        public override bool Equals(System.Object obj)
+        {
+            // If parameter is null return false.
+            if (obj == null)
+            {
+                return false;
+            }
+
+            // If parameter cannot be cast to Point return false.
+            BakEntryInfo p = obj as BakEntryInfo;
+            if ((System.Object)p == null)
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return (BackupDate == p.BackupDate);
+        }
+
+        public bool Equals(BakEntryInfo p)
+        {
+            // If parameter is null return false:
+            if ((object)p == null)
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return (BackupDate == p.BackupDate);
+        }
+
+        public override int GetHashCode()
+        {
+            return BackupDate.GetHashCode();
+        }
+
+        #endregion
 
     }
 }

@@ -20,6 +20,7 @@ namespace mnBackupLib
         /// </summary>
         public class Volumes
         {
+            
             /// <summary>
             /// Возвращает первый свободный диск в системе в виде L:
             /// </summary>
@@ -102,6 +103,19 @@ namespace mnBackupLib
                 }
                 return drives.ToArray();
             }
+
+        }
+
+        /// <summary>
+        /// Возвращает список файлов архива по имени архива. Сейчас заглушка всегда возвращает один файл
+        /// </summary>
+        /// <param name="FullArhName"></param>
+        /// <returns></returns>
+        public static string[] GetArhFiles(string FullArhName)
+        {
+            List<string> files = new List<string>();
+            files.Add(Path.GetFileName(FullArhName));
+            return files.ToArray();
 
         }
 

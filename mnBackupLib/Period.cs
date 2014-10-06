@@ -17,6 +17,8 @@ namespace mnBackupLib
         /// </summary>
         public enum PeriodName {Day, Week, Month }
 
+        #region Properties
+
         /// <summary>
         /// Имя периода
         /// </summary>
@@ -37,6 +39,10 @@ namespace mnBackupLib
         [DataMember]
         int intervalValue;
 
+        #endregion
+
+        #region Constructors
+
         public Period(PeriodName IntName, int IntValue)
         {
             intervalName = IntName;
@@ -48,7 +54,7 @@ namespace mnBackupLib
             intervalName = IntName;
             intervalValue = 1;
         }
-
+        
         /// <summary>
         /// Чтение периода из строки
         /// Возможные варианты:
@@ -63,14 +69,22 @@ namespace mnBackupLib
         {
             
             ParseI(str, out intervalName, out intervalValue);
-            
+
         }
+        
+        #endregion
 
         public override string ToString()
         {
             return intervalValue.ToString() + intervalName.ToString().Substring(0,1);
         }
-
+        /// <summary>
+        /// Чтение периода из строки. Возвращает имя периода и значение
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="periodName"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static bool ParseI(string str, out PeriodName periodName,out int value)
         {
             value = 1;
@@ -95,7 +109,11 @@ namespace mnBackupLib
             if (Str.EndsWith("m") || Str.EndsWith("month")) periodName = PeriodName.Month;
             return ret;
         }
-
+        /// <summary>
+        /// Прочитать период из строки
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static Period Parse(string str)
         {
             int val;
@@ -105,7 +123,12 @@ namespace mnBackupLib
             return p;
             
         }
-
+        /// <summary>
+        /// Прочитать период из строки
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static bool TryParse(string str,out Period p)
         {
             p = new Period(PeriodName.Day);

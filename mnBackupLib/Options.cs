@@ -88,6 +88,9 @@ namespace mnBackupLib
         [Option('t', "type", DefaultValue = TypeBackup.Full, HelpText = "Type backup Full|Differential")]
         public TypeBackup typeBackup { get; set; }
 
+        [Option('v', "VolumeSize", HelpText = "Sets the size in bytes of an archive volume (0 for no volumes, default)")]
+        public int? VolumeSize { get; set; }
+
         [Option("Interval", MetaValue = "period", HelpText = "Period in days between full backup for diff backup. May use 1d,1w,1m or number days")]
         public string Interval { get; set; }
 

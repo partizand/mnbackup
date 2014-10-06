@@ -45,6 +45,7 @@ namespace mnBackupLib
             try
             {
                 cmp.CompressFiles(ArhFileName, files);
+                //cmp.CompressDirectory(@"d:\Temp\mnBackupTest\source", @"d:\Temp\mnBackupTest\dest\voltest.7z");
                 return true;
             }
             

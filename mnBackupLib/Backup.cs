@@ -224,8 +224,14 @@ namespace mnBackupLib
                 }
                 si.UpdateStatus(sb2);
                 // Добавляем запись в манифест
-                BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, Path.GetFileName(FullArhName));
+                BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, FileManage.GetArhFiles(FullArhName));
                 manifest.Add(bakEntry);
+                // Удаляем старые архивы
+                //StatusBackup sb = StatusBackup.OK;
+                StatusBackup sb = DeleteOldArh(job, ref manifest);
+                si.UpdateStatus(sb);
+
+                manifest.Save();
             }
             else // нечего копировать
             {
@@ -239,12 +245,7 @@ namespace mnBackupLib
                     logger.Info("Nothing to backup");
                 }
             }
-            // Удаляем старые архивы
-            //StatusBackup sb = StatusBackup.OK;
-            StatusBackup sb = DeleteOldArh(job, ref manifest);
-            si.UpdateStatus(sb);
             
-            manifest.Save();
 
 
             logger.Info("Task finished with status {0}", si.Status);
@@ -302,22 +303,26 @@ namespace mnBackupLib
             if (baks == null) return si.Status;
             if (baks.Length == 0) return si.Status;
             string fullArhName;
-            int i;
+            int i,k;
             bool suc;
             for (i = 0; i < baks.Length; i++)
             {
-                fullArhName = Path.Combine(job.Destination, baks[i].BackupFileName);
-                suc = FileManage.FileDelete(fullArhName);
-                if (suc)
+                for (k = 0; k < baks[i].BackupFileNames.Length; k++)
                 {
-                    logger.Info("Удален архив {0}", fullArhName);
-                    manifest.Delete(baks[i].BackupDate);
-                    
-                }
-                else
-                {
-                    si.UpdateStatus(StatusBackup.Warning);
-                    logger.Warn("Не найден архив для удаления {0}", fullArhName);
+
+                    fullArhName = Path.Combine(manifest.ManifestDir, baks[i].BackupFileNames[k]);
+                    suc = FileManage.FileDelete(fullArhName);
+                    if (suc)
+                    {
+                        logger.Info("Удален архив {0}", fullArhName);
+                        manifest.Delete(baks[i].BackupDate);
+
+                    }
+                    else
+                    {
+                        si.UpdateStatus(StatusBackup.Warning);
+                        logger.Warn("Не найден архив для удаления {0}", fullArhName);
+                    }
                 }
             }
             return si.Status;

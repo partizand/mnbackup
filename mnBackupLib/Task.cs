@@ -101,6 +101,7 @@ namespace mnBackupLib
             this.Destination = taskOptions.Destination;
             this.Shadow = taskOptions.Shadow;
             this.Plan.Type = taskOptions.typeBackup;
+            // Interval
             if (taskOptions.Interval == null)
             {
                 this.Plan.Interval = new Period(Config.Instance.mnConfig.Interval);
@@ -109,6 +110,7 @@ namespace mnBackupLib
             {
                 this.Plan.Interval = new Period(taskOptions.Interval);
             }
+            // Store
             if (String.IsNullOrEmpty(taskOptions.Store))
             {
                 this.Plan.Store = new Period(Config.Instance.mnConfig.Store);
@@ -117,6 +119,12 @@ namespace mnBackupLib
             {
                 this.Plan.Store = new Period(taskOptions.Store);
             }
+            // VolumeSize
+            if (taskOptions.VolumeSize != null)
+            {
+                this.ArhParam.VolumeSize = (int)taskOptions.VolumeSize;
+            }
+            
 
         }
         /// <summary>
