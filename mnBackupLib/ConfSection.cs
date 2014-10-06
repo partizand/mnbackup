@@ -16,15 +16,15 @@ namespace mnBackupLib
         /// <summary>
         /// Имя файла с заданиями по умолчанию
         /// </summary>
-        public const string DEFAULT_TASK_FILENAME = "mnbackup.json";
+        const string DEFAULT_TASK_FILENAME = "mnbackup.json";
         /// <summary>
         /// Интервал между полными копиями по умолчанию
         /// </summary>
-        public const string DEFAULT_INTERVAL = "1w";
+        const string DEFAULT_INTERVAL = "1w";
         /// <summary>
         /// время хранения полных копий по умолчанию
         /// </summary>
-        public const string DEFAULT_STORE = "1m";
+        const string DEFAULT_STORE = "1m";
 
         #endregion
 
@@ -71,6 +71,13 @@ namespace mnBackupLib
 
             );
 
+            s_propTempDir = new ConfigurationProperty(
+                "TempDir",
+                typeof(string),
+                null,
+                ConfigurationPropertyOptions.None
+            );
+
             s_propString = new ConfigurationProperty(
                 "stringValue",
                 typeof(string),
@@ -97,6 +104,7 @@ namespace mnBackupLib
             s_properties.Add(s_propInterval);
             s_properties.Add(s_propStore);
             s_properties.Add(s_propTaskFile);
+            s_properties.Add(s_propTempDir);
 
             s_properties.Add(s_propString);
             s_properties.Add(s_propBool);
@@ -118,6 +126,7 @@ namespace mnBackupLib
         private static ConfigurationProperty s_propInterval;
         private static ConfigurationProperty s_propStore;
         private static ConfigurationProperty s_propTaskFile;
+        private static ConfigurationProperty s_propTempDir;
 
         private static ConfigurationProperty s_propString;
         private static ConfigurationProperty s_propBool;
@@ -163,6 +172,16 @@ namespace mnBackupLib
         {
             get { return (string)base[s_propInterval]; }
             set { base[s_propInterval] = value; }
+        }
+
+        /// <summary>
+        /// Временный каталог для создания архивов
+        /// </summary>
+        [ConfigurationProperty("TempDir")]
+        public string TempDir
+        {
+            get { return (string)base[s_propTempDir]; }
+            set { base[s_propTempDir] = value; }
         }
 
         /// <summary>

@@ -16,18 +16,7 @@ namespace mnBackupLib
     /// </summary>
     public class Config:Singleton<Config>
     {
-        /// <summary>
-        /// Имя файла с заданиями по умолчанию
-        /// </summary>
-        public const string DEFAULT_TASK_FILENAME = "mnbackup.json";
-        /// <summary>
-        /// Интервал между полными копиями по умолчанию
-        /// </summary>
-        public const string DEFAULT_FULL_INTERVAL = "1w";
-        /// <summary>
-        /// время хранения полных копий
-        /// </summary>
-        public const string DEFAULT_FULL_STORE = "1m";
+        
 
         public ConfSection mnConfig{get {return _mnConfig;}}
 

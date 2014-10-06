@@ -31,8 +31,8 @@ namespace mnBackupLib
         public BackupPlan()
         {
             Type = TypeBackup.Full;
-            Interval = new Period(Config.DEFAULT_FULL_INTERVAL);
-            Store = new Period(Config.DEFAULT_FULL_STORE);
+            Interval = new Period(Config.Instance.mnConfig.Interval);
+            Store = new Period(Config.Instance.mnConfig.Store);
         }
         
     

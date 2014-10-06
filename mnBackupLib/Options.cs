@@ -64,6 +64,9 @@ namespace mnBackupLib
     {
         [Option('e', "ExposeVolume", MetaValue = "DriveLetter", HelpText = "Volume letter to mount snapshot of shadow copy")]
         public string ExposeVolume { get; set; }
+
+        [Option("TempDir", HelpText = "Temp dir for create archives")]
+        public string TempDir { get; set; }
         
         [Option("MailHost", HelpText = "Mail server name for send reports")]
         public string MailHost { get; set; }
@@ -107,7 +110,7 @@ namespace mnBackupLib
     /// </summary>
     public sealed class RunSubOptions : CommonSubOptions
     {
-        [Option('f', "file", MetaValue = "FILE", DefaultValue = Config.DEFAULT_TASK_FILENAME, HelpText = "Task file")]
+        [Option('f', "file", MetaValue = "FILE", HelpText = "Task file")]
         public string TaskFile { get; set; }
 
 
