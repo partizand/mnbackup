@@ -18,34 +18,34 @@ namespace mnBackupTest
             
             DateTime dt=today.AddDays(-6);
             string[] arhName = { "ArhName1" };
-            BakEntryInfo bakEntry1 = new BakEntryInfo(dt, TypeBackup.Full, StatusBackup.OK, arhName);
+            BackupInfo bakEntry1 = new BackupInfo(dt, TypeBackup.Full, StatusBackup.OK, arhName);
             man.Add(bakEntry1);
             
             arhName = new string[] { "ArhName2" };
             dt = today.AddDays(-5);
-            BakEntryInfo bakEntry2 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
+            BackupInfo bakEntry2 = new BackupInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
             man.Add(bakEntry2);
 
             arhName = new string[] { "ArhName3" };
             dt = today.AddDays(-4);
-            BakEntryInfo bakEntry3 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
+            BackupInfo bakEntry3 = new BackupInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
             man.Add(bakEntry3);
 
             arhName = new string[] { "ArhName4" };
             DateTime dtFull = today.AddDays(-3);
-            BakEntryInfo bakEntry4 = new BakEntryInfo(dtFull, TypeBackup.Full, StatusBackup.OK, arhName);
+            BackupInfo bakEntry4 = new BackupInfo(dtFull, TypeBackup.Full, StatusBackup.OK, arhName);
             man.Add(bakEntry4);
 
             arhName = new string[] { "ArhName5" };
             dt = today.AddDays(-2);
-            BakEntryInfo bakEntry5 = new BakEntryInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
+            BackupInfo bakEntry5 = new BackupInfo(dt, TypeBackup.Differential, StatusBackup.OK, arhName);
             man.Add(bakEntry5);
 
             DateTime lastFull=man.GetLastFullDate();
             Assert.AreEqual(dtFull, lastFull, "Последнее полное копирование");
 
             Period period=new Period(Period.PeriodName.Day,4);
-            BakEntryInfo[] toDelete=man.GetAllBeforePeriod(period);
+            BackupInfo[] toDelete=man.GetAllBeforePeriod(period);
             Assert.AreEqual(3, toDelete.Length, "Заданий на удаление");
 
             Assert.AreEqual(bakEntry1, toDelete[0], "Удаляемое задание 1");

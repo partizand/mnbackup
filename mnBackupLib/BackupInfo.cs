@@ -10,7 +10,7 @@ namespace mnBackupLib
     /// Запись об одном копировании
     /// </summary>
     [DataContract]
-    public class BakEntryInfo : IComparable<BakEntryInfo>
+    public class BackupInfo : IComparable<BackupInfo>
 
     {
         /// <summary>
@@ -51,7 +51,7 @@ namespace mnBackupLib
         /// <param name="typeBackup"></param>
         /// <param name="status"></param>
         /// <param name="backupFileNames"></param>
-        public BakEntryInfo(DateTime dt,TypeBackup typeBackup, StatusBackup status,string[] backupFileNames)
+        public BackupInfo(DateTime dt,TypeBackup typeBackup, StatusBackup status,string[] backupFileNames)
         {
             this.BackupDate = dt;
             this.TypeBackup = typeBackup;
@@ -67,7 +67,7 @@ namespace mnBackupLib
         /// <param name="typeBackup"></param>
         /// <param name="status"></param>
         /// <param name="backupFileNames"></param>
-        public BakEntryInfo(TypeBackup typeBackup, StatusBackup status, string[] backupFileNames)
+        public BackupInfo(TypeBackup typeBackup, StatusBackup status, string[] backupFileNames)
         {
             this.BackupDate = DateTime.Now;
             this.TypeBackup = typeBackup;
@@ -80,7 +80,7 @@ namespace mnBackupLib
 
         #region Equals ovveride
 
-        public int CompareTo(BakEntryInfo other)
+        public int CompareTo(BackupInfo other)
         {
             
             return BackupDate.CompareTo(other.BackupDate);
@@ -95,7 +95,7 @@ namespace mnBackupLib
             }
 
             // If parameter cannot be cast to Point return false.
-            BakEntryInfo p = obj as BakEntryInfo;
+            BackupInfo p = obj as BackupInfo;
             if ((System.Object)p == null)
             {
                 return false;
@@ -105,7 +105,7 @@ namespace mnBackupLib
             return (BackupDate == p.BackupDate);
         }
 
-        public bool Equals(BakEntryInfo p)
+        public bool Equals(BackupInfo p)
         {
             // If parameter is null return false:
             if ((object)p == null)

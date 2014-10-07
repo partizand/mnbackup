@@ -213,7 +213,7 @@ namespace mnBackupLib
                 }
                 si.UpdateStatus(sb2);
                 // Добавляем запись в манифест
-                BakEntryInfo bakEntry = new BakEntryInfo(BakType, si.Status, FileManage.GetArhFiles(FullArhName));
+                BackupInfo bakEntry = new BackupInfo(BakType, si.Status, FileManage.GetArhFiles(FullArhName));
                 manifest.Add(bakEntry);
                 // Удаляем старые архивы
                 //StatusBackup sb = StatusBackup.OK;
@@ -288,7 +288,7 @@ namespace mnBackupLib
             // Какие архивы нужно удалить
             //StatusBackup st = StatusBackup.OK;
             StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
-            BakEntryInfo[] baks = manifest.GetAllBeforePeriod(job.Plan.Store);
+            BackupInfo[] baks = manifest.GetAllBeforePeriod(job.Plan.Store);
             if (baks == null) return si.Status;
             if (baks.Length == 0) return si.Status;
             string fullArhName;

@@ -28,7 +28,7 @@ namespace mnBackupLib
         /// <summary>
         /// Записи о бэкапах
         /// </summary>
-        List<BakEntryInfo> Lines;
+        List<BackupInfo> Lines;
 
         /// <summary>
         /// Имя файла с манифестом
@@ -50,8 +50,8 @@ namespace mnBackupLib
             _ManifestDir = Path.GetDirectoryName(manifestFile);
             
             //Lines =  new List<BakEntryInfo>();
-            Lines = SerialIO.Read<List<BakEntryInfo>>(ManifestFile);
-            if (Lines == null) Lines = new List<BakEntryInfo>();
+            Lines = SerialIO.Read<List<BackupInfo>>(ManifestFile);
+            if (Lines == null) Lines = new List<BackupInfo>();
             
             Lines.Sort();
         }
@@ -67,7 +67,7 @@ namespace mnBackupLib
         /// Добавить запись об одном копировании
         /// </summary>
         /// <param name="bakEntry"></param>
-        public void Add(BakEntryInfo bakEntry)
+        public void Add(BackupInfo bakEntry)
         {
             Lines.Add(bakEntry);
             Lines.Sort();
@@ -91,7 +91,7 @@ namespace mnBackupLib
         /// <returns></returns>
         public DateTime GetLastFullDate()
         {
-            List<BakEntryInfo> full = Lines.FindAll(obj => obj.TypeBackup == TypeBackup.Full);
+            List<BackupInfo> full = Lines.FindAll(obj => obj.TypeBackup == TypeBackup.Full);
             return full.Max(obj => obj.BackupDate);
         }
         /// <summary>
@@ -101,7 +101,7 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="FullIntervalSave"></param>
         /// <returns></returns>
-        public BakEntryInfo[] GetAllBeforePeriod(Period FullIntervalSave)
+        public BackupInfo[] GetAllBeforePeriod(Period FullIntervalSave)
         {
             if (FullIntervalSave.IntervalValue == 0) return null;
             DateTime dtBefore = FullIntervalSave.SubFromDate(DateTime.Today);
@@ -110,7 +110,7 @@ namespace mnBackupLib
             // Все за этим индексом удалить
             if (iLastFullToStay > -1)
             {
-                List<BakEntryInfo> fullToDelete = Lines.GetRange(0, iLastFullToStay);
+                List<BackupInfo> fullToDelete = Lines.GetRange(0, iLastFullToStay);
                 if (fullToDelete == null) return null;
                 return fullToDelete.ToArray();
             }
