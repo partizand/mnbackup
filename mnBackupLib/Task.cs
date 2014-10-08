@@ -45,9 +45,9 @@ namespace mnBackupLib
         /// Каталог источник
         /// </summary>
         [DataMember]
-        public string[] Source { get { return _Source; } }
+        public string[] Source { get; set; }
         //public string[] Source { get; set; }
-        private string[] _Source;
+        //private string[] _Source;
 
         /// <summary>
         /// Список дисков источников (для теневого копирования)
@@ -58,7 +58,7 @@ namespace mnBackupLib
         /// Каталог приемник
         /// </summary>
         [DataMember]
-        public string Destination { get; set; }
+        public string[] Destination { get; set; }
 
         /// <summary>
         /// План бэкапа (полный, разностный, сколько копий хранить и т.д.)
@@ -80,7 +80,7 @@ namespace mnBackupLib
             //Enabled = true;
             NameTask = nameTask;
             SetSource(source);
-            Destination = destination;
+            this.Destination = FileManage.ConvertToArray(destination);
             Init();
         }
         public Task(TaskSubOptions taskOptions)
@@ -98,7 +98,7 @@ namespace mnBackupLib
             }
             SetSource(taskOptions.Source);
             //this.Source = FileManage.ConvertToArray(taskOptions.Source);
-            this.Destination = taskOptions.Destination;
+            this.Destination = FileManage.ConvertToArray(taskOptions.Destination);
             this.Shadow = taskOptions.Shadow;
             this.Plan.Type = taskOptions.typeBackup;
             // Interval
@@ -142,13 +142,16 @@ namespace mnBackupLib
         
 
         /// <summary>
-        /// Возвращает имя файла манифеста
+        /// Возвращает имя файла манифеста в каталоге назначения
         /// </summary>
         /// <returns></returns>
         public string GetManifestFile()
         {
-            string manifestFile = Path.Combine(Destination, "manifest"+GetPrefix()+".json");
-            
+            //string dest = String.Empty;
+            //if (destIndex < Destination.Length) dest = Destination[destIndex];
+            //string manifestFile = Path.Combine(dest, "manifest"+GetPrefix()+".json");
+            string manifestFile =  "manifest" + GetPrefix() + ".json";
+
             return manifestFile;
         }
         /// <summary>
@@ -157,7 +160,7 @@ namespace mnBackupLib
         /// <param name="sources">Список каталогов источника разделенных ;</param>
         private void SetSource(string sources)
         {
-            this._Source = FileManage.ConvertToArray(sources);
+            this.Source = FileManage.ConvertToArray(sources);
             _SourceVolumes = GetSourceVolumes();
         }
 
@@ -167,10 +170,11 @@ namespace mnBackupLib
         /// <param name="sources">Список каталогов источника разделенных ;</param>
         private void SetSource(string[] sources)
         {
-            this._Source = sources;
+            this.Source = sources;
             _SourceVolumes = GetSourceVolumes();
         }
 
+        
         /// <summary>
         /// Получить имя архива, без пути
         /// </summary>
@@ -181,9 +185,61 @@ namespace mnBackupLib
             string pref=GetPrefix();
             
             pref = pref + DateTime.Now.ToString("_yyMMdd-HHmmss_") + type + ".7z";// Добавить текущую дату и время
-            pref = Path.Combine(this.Destination, pref);
+            //pref = Path.Combine(this.Destination, pref);
             return pref; 
         }
+        /// <summary>
+        /// Возвращает каталог в который нужно архивировать.
+        /// Это либо временный каталог, либо первый каталог из списка Destination
+        /// </summary>
+        /// <returns></returns>
+        public string GetArhWorkDir()
+        {
+            string WorkDir;
+            
+            // Архивация может идти в TempDir или в первый каталог приемника
+            if (this.Destination.Length > 0)
+            {
+                if (!String.IsNullOrEmpty(Config.Instance.mnConfig.TempDir))
+                {
+                    // Опеределить фиксированный ли это диск или сетевой
+                    string root = Path.GetPathRoot(Destination[0]);
+                    try
+                    {
+                        DriveInfo drive = new DriveInfo(root);
+                        if (drive.DriveType == DriveType.Fixed) // Fixed disk
+                        {
+                            WorkDir = Destination[0];
+                            return WorkDir;
+
+                        }
+                        else // Non fixed disk
+                        {
+                            WorkDir = Config.Instance.mnConfig.TempDir;
+                            return WorkDir;
+                        }
+                    }
+                    catch // No drive letter
+                    {
+                        WorkDir = Config.Instance.mnConfig.TempDir;
+                        return WorkDir;
+                    }
+                    
+                }
+                else
+                {
+                    WorkDir = Destination[0];
+                    return WorkDir;
+                }
+
+            }
+            return String.Empty;
+            
+            
+
+
+        }
+
         /// <summary>
         /// Получить префикс задания
         /// </summary>

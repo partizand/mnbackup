@@ -148,6 +148,38 @@ namespace mnBackupLib
             }
         }
         /// <summary>
+        /// Безопасное копирование файла
+        /// </summary>
+        /// <param name="sourceFileName"></param>
+        /// <param name="destFileName"></param>
+        /// <param name="overwrite"></param>
+        /// <returns></returns>
+        public static bool FileCopy(string sourceFileName,string destFileName,bool overwrite)
+        {
+            try
+            {
+                File.Copy(sourceFileName, destFileName, overwrite);
+                return true;
+            }
+            catch (Exception e)
+            {
+                logger.Error("Ошибка копирования файла {0} в {1}. {2}", sourceFileName,destFileName, e.Message);
+                return false;
+            }
+
+        }
+        /// <summary>
+        /// Безопасное копирование файла
+        /// </summary>
+        /// <param name="sourceFileName"></param>
+        /// <param name="destFileName"></param>
+        /// <returns></returns>
+        public static bool FileCopy(string sourceFileName, string destFileName)
+        {
+            return FileCopy(sourceFileName, destFileName, false);
+        }
+
+        /// <summary>
         /// Удаление каталога
         /// </summary>
         /// <param name="DirectoryName"></param>

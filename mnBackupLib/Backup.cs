@@ -121,34 +121,23 @@ namespace mnBackupLib
         {
             logger.Info("Start task {0}", job.NameTask);
             StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
-            
+
+            StatusBackup status;
+
             //StatusInfo<bool> si2 = new StatusInfo<bool>(true);
             
-            
             // Проверка существования каталогов
-            if (CheckDir(job.Source) == StatusBackup.Fatal)
+            status = CheckDir(job.Source, false); // Источников
+            si.UpdateStatus(status);
+            status = CheckDir(job.Destination, true); // Приемников
+            si.UpdateStatus(status);
+            if (si.Status == StatusBackup.Fatal)
             {
-                logger.Error("Source dirs not founded");
                 logger.Error("Task finished with status {0}", si.Status);
-                return StatusBackup.Fatal;
+                return si.Status;
             }
-            
-            
-
-            if (!Directory.Exists(job.Destination))
-            {
-
-                bool cr = FileManage.DirectoryCreate(job.Destination);
-                if (!cr)
-                {
-                    
-                    logger.Error("Каталог приемника не существует {0}", job.Destination);
-                    logger.Error("Task finished with status {0}", si.Status);
-                    return StatusBackup.Fatal;
-                }
-            }
-            
-            Manifest manifest = new Manifest(job.GetManifestFile());
+            // Определение типа копирования
+            Manifest manifest = new Manifest(job);
             TypeBackup BakType = manifest.GetCurrentTypeBackup(job.Plan);
             logger.Info("Backup type: {0}", BakType);
             if (BakType == TypeBackup.Differential) // Текущее копирование не полное
@@ -159,81 +148,103 @@ namespace mnBackupLib
             }
 
             // Имя архива
-            string FullArhName = job.GetArhName(BakType.ToString());
+            string ShortArhName = job.GetArhName(BakType.ToString());
             string[] files = job.GetFiles(); // файлы для обработки
 
-            
-
-            if (files.Length > 0)
-            {
-
-                
-                StatusBackup sb2 = StatusBackup.OK;
-                if (job.Shadow)
-                {
-                    logger.Info("Shadow copy using");
-                    try
-                    {
-                        if (job.SourceVolumes.Length!=1) // в источниках больше одного тома, теневое копирование на это не рассчитано
-                        {
-                            logger.Error("Too many volumes to shadow, use only one (or noo volumes, check source)");
-                            return StatusBackup.Fatal;
-                        }
-                        string freeLetter = FileManage.Volumes.GetFreeLetter(Config.Instance.mnConfig.ExposeVolume);
-                        if (String.IsNullOrEmpty(freeLetter))
-                        {
-                            logger.Error("No free letter to map snapshot");
-                            return StatusBackup.Fatal;
-                        }
-                        using (Snapshot vss = new Snapshot(job.SourceVolumes[0], freeLetter))
-                        {
-                            //logger.Info("Creating shadow copy");
-                            //vss.Setup(Path.GetPathRoot(job.Source),"L:");
-                            vss.DoSnapshotSet();
-                            
-                            string[] ShadowFiles = vss.GetSnapshotPath(files);
-
-                            // Here we use the AlphaFS library to make the copy.
-                            //Alphaleonis.Win32.Filesystem.File.Copy(snap_path, backup_path);
-                            
-                            sb2 = DoFiles(job, FullArhName, ShadowFiles);
-                            //logger.Info("Deleting shadow copy");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error("Shadow error {0}", e.Message);
-                        si.UpdateStatus(StatusBackup.Error);
-                    }
-                }
-                else
-                {
-
-                    sb2 = DoFiles(job, FullArhName, files);
-                }
-                si.UpdateStatus(sb2);
-                // Добавляем запись в манифест
-                BackupInfo bakEntry = new BackupInfo(BakType, si.Status, FileManage.GetArhFiles(FullArhName));
-                manifest.Add(bakEntry);
-                // Удаляем старые архивы
-                //StatusBackup sb = StatusBackup.OK;
-                StatusBackup sb = DeleteOldArh(job, ref manifest);
-                si.UpdateStatus(sb);
-
-                manifest.Save();
-            }
-            else // нечего копировать
+            if (files.Length<1) // нечего копировать
             {
                 if (BakType == TypeBackup.Full)
                 {
                     logger.Error("Nothing to full backup");
                     si.UpdateStatus(StatusBackup.Fatal);
+                    
                 }
                 else
                 {
                     logger.Info("Nothing to backup");
                 }
+                logger.Error("Task finished with status {0}", si.Status);
+                return si.Status;
             }
+
+            // Архивация может идти в TempDir или в первый каталог приемника
+            string arhDir = job.GetArhWorkDir();
+            string FullArhName = Path.Combine(arhDir, ShortArhName);
+
+            StatusBackup sb2 = StatusBackup.OK;
+            if (job.Shadow)
+            {
+                logger.Info("Shadow copy using");
+                try
+                {
+                    if (job.SourceVolumes.Length != 1) // в источниках больше одного тома, теневое копирование на это не рассчитано
+                    {
+                        logger.Error("Too many volumes to shadow, use only one (or noo volumes, check source)");
+                        return StatusBackup.Fatal;
+                    }
+                    string freeLetter = FileManage.Volumes.GetFreeLetter(Config.Instance.mnConfig.ExposeVolume);
+                    if (String.IsNullOrEmpty(freeLetter))
+                    {
+                        logger.Error("No free letter to map snapshot");
+                        return StatusBackup.Fatal;
+                    }
+                    using (Snapshot vss = new Snapshot(job.SourceVolumes[0], freeLetter))
+                    {
+                        //logger.Info("Creating shadow copy");
+                        //vss.Setup(Path.GetPathRoot(job.Source),"L:");
+                        vss.DoSnapshotSet();
+
+                        string[] ShadowFiles = vss.GetSnapshotPath(files);
+
+                        // Here we use the AlphaFS library to make the copy.
+                        //Alphaleonis.Win32.Filesystem.File.Copy(snap_path, backup_path);
+
+                        sb2 = DoFiles(job, FullArhName, ShadowFiles);
+                        //logger.Info("Deleting shadow copy");
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("Shadow error {0}", e.Message);
+                    si.UpdateStatus(StatusBackup.Error);
+                }
+            }
+            else
+            {
+
+                sb2 = DoFiles(job, FullArhName, files);
+            }
+            si.UpdateStatus(sb2);
+            // Создаем информацию о копировании
+            string[] arhFiles = FileManage.GetArhFiles(FullArhName);
+            BackupInfo bakEntry = new BackupInfo(BakType, si.Status, arhFiles);
+            // Копируем архив в другие приемники
+            int start=String.Compare(job.Destination[0],arhDir,true)==0 ? 1:0;
+            int i,k;
+            string fromFile,toFile;
+            for (i = start; i < job.Destination.Length; i++)
+            {
+                // Копируются файлы
+                for (k = 0; k < arhFiles.Length; k++)
+                {
+                    fromFile = Path.Combine(arhDir, arhFiles[k]);
+                    toFile = Path.Combine(job.Destination[i], arhFiles[k]);
+                    FileManage.FileCopy(fromFile, toFile);
+                }
+                
+                
+            }
+            
+            // Добавляем запись в манифест
+            manifest.Add(bakEntry);
+            // Удаляем старые архивы
+            //StatusBackup sb = StatusBackup.OK;
+            StatusBackup sb = manifest.DeleteOld(job.Plan.Store);
+            si.UpdateStatus(sb);
+
+            manifest.Save();
+            
+            
             
 
 
@@ -257,8 +268,14 @@ namespace mnBackupLib
             return si.Status;
             
         }
-
-        private StatusBackup CheckDir(string[] dirs)
+        /// <summary>
+        /// Проверка существования каталогов источника (isDestination-false) или приемника (isDestination-true)
+        /// Попытка создания не существующих, запись в лог
+        /// </summary>
+        /// <param name="dirs"></param>
+        /// <param name="isDestination">false-источник, true-приемник</param>
+        /// <returns></returns>
+        private StatusBackup CheckDir(string[] dirs,bool isDestination)
         {
             if (dirs.Length < 1) return StatusBackup.Fatal;
             StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
@@ -268,54 +285,36 @@ namespace mnBackupLib
                 // Проверка существования каталогов
                 if (!Directory.Exists(dir))
                 {
-                    si.UpdateStatus(StatusBackup.Error);
-                    logger.Error("Directory does not exist {0}", dir);
-                    i++;
+                    if (isDestination)
+                    {
+                        // Попробовать создать каталог
+                        bool cr = FileManage.DirectoryCreate(dir);
+                        if (!cr)
+                        {
+                            logger.Error("Directory does not exist {0}", dir);
+                            si.UpdateStatus(StatusBackup.Error);
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        si.UpdateStatus(StatusBackup.Error);
+                        logger.Error("Directory does not exist {0}", dir);
+                        i++;
+                    }
                 }
             }
-            if (i == dirs.Length) si.UpdateStatus(StatusBackup.Fatal); // Ни одного каталога нет
+            if (i == dirs.Length)
+            {
+                si.UpdateStatus(StatusBackup.Fatal); // Ни одного каталога нет
+                logger.Error("Task finished with status {0}", si.Status);
+            }
             
             return si.Status;
 
         }
 
-        /// <summary>
-        /// Удаление старых архивов
-        /// </summary>
-        /// <param name="job"></param>
-        private StatusBackup DeleteOldArh(Task job, ref Manifest manifest)
-        {
-            // Какие архивы нужно удалить
-            //StatusBackup st = StatusBackup.OK;
-            StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
-            BackupInfo[] baks = manifest.GetAllBeforePeriod(job.Plan.Store);
-            if (baks == null) return si.Status;
-            if (baks.Length == 0) return si.Status;
-            string fullArhName;
-            int i,k;
-            bool suc;
-            for (i = 0; i < baks.Length; i++)
-            {
-                for (k = 0; k < baks[i].BackupFileNames.Length; k++)
-                {
-
-                    fullArhName = Path.Combine(manifest.ManifestDir, baks[i].BackupFileNames[k]);
-                    suc = FileManage.FileDelete(fullArhName);
-                    if (suc)
-                    {
-                        logger.Info("Удален архив {0}", fullArhName);
-                        manifest.Delete(baks[i].BackupDate);
-
-                    }
-                    else
-                    {
-                        si.UpdateStatus(StatusBackup.Warning);
-                        logger.Warn("Не найден архив для удаления {0}", fullArhName);
-                    }
-                }
-            }
-            return si.Status;
-        }
+        
 
 
 

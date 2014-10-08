@@ -15,45 +15,44 @@ namespace mnBackupLib
 
         #region Properties
 
-
-        /// <summary>
-        /// Каталог с файлами бэкапа данного манифеста, расположение манифеста
-        /// </summary>
-        public string ManifestDir { get { return _ManifestDir; } }
-        /// <summary>
-        /// Каталог с файлами бэкапа данного манифеста, расположение манифеста private
-        /// </summary>
-        private string _ManifestDir;
-        
-        /// <summary>
-        /// Записи о бэкапах
-        /// </summary>
-        List<BackupInfo> Lines;
-
-        /// <summary>
-        /// Имя файла с манифестом
-        /// </summary>
-        public string ManifestFileName
-        {
-            get {return ManifestFile;}
-        }
-        /// <summary>
-        /// Имя файла с манифестом private
-        /// </summary>
-        private string ManifestFile;
-
+        private ManifestInfo[] Mans;
+       
         #endregion
-
-        public Manifest(string manifestFile)
+        /*
+        public Manifest(string manifestFile,string[] DestDirs)
         {
             ManifestFile = manifestFile;
             _ManifestDir = Path.GetDirectoryName(manifestFile);
             
             //Lines =  new List<BakEntryInfo>();
+            
             Lines = SerialIO.Read<List<BackupInfo>>(ManifestFile);
             if (Lines == null) Lines = new List<BackupInfo>();
             
             Lines.Sort();
+        }
+         */ 
+        public Manifest(Task job)
+        {
+            string ShortManifestFile = job.GetManifestFile();
+            //_ManifestDir = job.Destination[0];
+
+            
+
+            string fullManFile;
+
+            //Lines =  new List<BakEntryInfo>();
+            //Lines = Array.CreateInstance(typeof(List<BackupInfo>),2) ;
+            
+            int i;
+            List<ManifestInfo> LMans = new List<ManifestInfo>();
+            for (i = 0; i < job.Destination.Length; i++)
+            {
+                fullManFile = Path.Combine(job.Destination[i], ShortManifestFile);
+                LMans.Add(new ManifestInfo(fullManFile));
+            }
+            Mans = LMans.ToArray();
+            
         }
         
         /// <summary>
@@ -61,7 +60,17 @@ namespace mnBackupLib
         /// </summary>
         public bool Save()
         {
-            return SerialIO.Save(ManifestFile, Lines);
+            
+            StatusInfo<bool> si = new StatusInfo<bool>(false);
+            bool ret;
+            for (int i = 0; i < Mans.Length; i++)
+            {
+                
+                ret = Mans[i].Save();
+                si.UpdateStatus(!ret);
+                
+            }
+            return !si.Status;
         }
         /// <summary>
         /// Добавить запись об одном копировании
@@ -69,8 +78,11 @@ namespace mnBackupLib
         /// <param name="bakEntry"></param>
         public void Add(BackupInfo bakEntry)
         {
-            Lines.Add(bakEntry);
-            Lines.Sort();
+            for (int i = 0; i < Mans.Length; i++)
+            {
+                Mans[i].Add(bakEntry);
+                
+            }
         }
         
         
@@ -81,18 +93,38 @@ namespace mnBackupLib
         /// <param name="dateBackup"></param>
         public void Delete(DateTime dateBackup)
         {
-            int i=Lines.FindIndex(obj => obj.BackupDate == dateBackup);
-            if (i > -1) Lines.RemoveAt(i);
+            for (int i = 0; i < Mans.Length; i++)
+            {
+                Mans[i].Delete(dateBackup);
+            }
         }
-        
+
+        /// <summary>
+        /// Удалить старые архивы
+        /// </summary>
+        /// <param name="store"></param>
+        /// <returns></returns>
+        public StatusBackup DeleteOld(Period store)
+        {
+            int i;
+            StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
+            
+            for (i = 0; i < Mans.Length; i++)
+            {
+                si.UpdateStatus(Mans[i].DeleteOld(store));
+            }
+
+            return si.Status;
+        }
+
+
         /// <summary>
         /// Дата последнего полного копирования
         /// </summary>
         /// <returns></returns>
         public DateTime GetLastFullDate()
         {
-            List<BackupInfo> full = Lines.FindAll(obj => obj.TypeBackup == TypeBackup.Full);
-            return full.Max(obj => obj.BackupDate);
+            return Mans[0].GetLastFullDate();
         }
         /// <summary>
         /// Возвращает все копирования не попадающие в период (для удаления)
@@ -103,30 +135,8 @@ namespace mnBackupLib
         /// <returns></returns>
         public BackupInfo[] GetAllBeforePeriod(Period FullIntervalSave)
         {
-            if (FullIntervalSave.IntervalValue == 0) return null;
-            DateTime dtBefore = FullIntervalSave.SubFromDate(DateTime.Today);
-            // Индекс первого полного копирования которое нужно оставить
-            int iLastFullToStay = Lines.FindIndex(obj => obj.BackupDate >= dtBefore && obj.TypeBackup == TypeBackup.Full);
-            // Все за этим индексом удалить
-            if (iLastFullToStay > -1)
-            {
-                List<BackupInfo> fullToDelete = Lines.GetRange(0, iLastFullToStay);
-                if (fullToDelete == null) return null;
-                return fullToDelete.ToArray();
-            }
-            else
-            {
-                return null;
-            }
-            
-            //if (fullToDelete.Count == 0) return null;
-
-
-           
-
-            
-
-           
+            return Mans[0].GetAllBeforePeriod(FullIntervalSave);
+   
         }
         /// <summary>
         /// Возвращает тип копирования который нужно сделать
@@ -135,11 +145,8 @@ namespace mnBackupLib
         /// <returns></returns>
         public TypeBackup GetCurrentTypeBackup(BackupPlan backupPlan)
         {
-            if (backupPlan.Type == TypeBackup.Full) return TypeBackup.Full;
-            bool has = backupPlan.Interval.IsInInterval(GetLastFullDate());
-            if (has) return TypeBackup.Full;
-            else return TypeBackup.Differential;
-            
+            return Mans[0].GetCurrentTypeBackup(backupPlan);
+
         }
         
         

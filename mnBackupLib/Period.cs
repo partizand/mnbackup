@@ -39,6 +39,11 @@ namespace mnBackupLib
         [DataMember]
         int intervalValue;
 
+        public int Days { get; set; }
+        public int Weeks { get; set; }
+        public int Months { get; set; }
+        public int Years { get; set; }
+
         #endregion
 
         #region Constructors
@@ -258,7 +263,7 @@ namespace mnBackupLib
             if (multiplier < 0) multiplier = -1;
             if (multiplier > 0) multiplier = 1;
             if (multiplier == 0) multiplier = 1;
-
+            
             switch (intervalName)
             {
                 case PeriodName.Day:
@@ -277,6 +282,30 @@ namespace mnBackupLib
 
             }
             return dtAdd;
+        }
+
+        public TimeSpan GetTimeSpan()
+        {
+            TimeSpan ts;
+            // Определяем количество дней
+            int days;
+            switch (intervalName)
+            {
+                case PeriodName.Day:
+                    days = intervalValue;
+                    break;
+                case PeriodName.Week:
+                    days = intervalValue * 7;
+                    break;
+                case PeriodName.Month:
+                    days = dMonths(intervalValue * multiplier);
+                    break;
+                default:
+                    days = intervalValue;
+                    break;
+
+
+            }
         }
  
         

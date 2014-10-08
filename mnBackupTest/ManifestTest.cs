@@ -13,7 +13,8 @@ namespace mnBackupTest
         [Test]
         public void TestManifest()
         {
-            Manifest man=new Manifest("");
+            Task job = new Task("TestTask", "c:\\temp\\source", "d:\\temp\\dest");
+            Manifest man=new Manifest(job);
             DateTime today=DateTime.Today;
             
             DateTime dt=today.AddDays(-6);

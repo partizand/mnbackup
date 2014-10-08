@@ -100,10 +100,11 @@
     <Compile Include="ConfSection.cs" />
     <Compile Include="FileFilter.cs" />
     <Compile Include="FileManage.cs" />
+    <Compile Include="ManifestInfo.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Period.cs" />
     <Compile Include="Manifest.cs" />
-    <Compile Include="BakEntryInfo.cs" />
+    <Compile Include="BackupInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
