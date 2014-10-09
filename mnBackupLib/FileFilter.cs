@@ -16,7 +16,7 @@ namespace mnBackupLib
     public class FileFilter
     {
         
-        public enum AttributeFlag { NotUse, Set, NotSet };
+        //public enum AttributeFlag { NotUse, Set, NotSet };
         
         /// <summary>
         /// Маски включаемых файлов, разделяются ,;|

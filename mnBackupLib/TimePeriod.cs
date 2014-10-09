@@ -2,18 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace mnBackupLib
 {
+    [DataContract]
     public class TimePeriod
     {
+        [DataContract]
         public struct TimeRange
         {
+            [DataMember]
             public int Days { get; set; }
+            [DataMember]
             public int Weeks { get; set; }
+            [DataMember]
             public int Months { get; set; }
+            [DataMember]
             public int Years { get; set; }
         }
+
+        [DataMember]
         public TimeRange Range;
 
         #region Constructors
@@ -21,6 +30,7 @@ namespace mnBackupLib
         public TimePeriod()
         {
             Range=new TimeRange();
+            
             Range.Days = 0;
             Range.Weeks = 0;
             Range.Months = 0;

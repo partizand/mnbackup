@@ -85,6 +85,18 @@ namespace mnBackupLib
         [Option('d', "dest", MetaValue = "Dir", Required = true, HelpText = "Destination dir")]
         public string Destination { get; set; }
 
+        [Option('i',"include", MetaValue = "Mask", HelpText = "Include file masks, delimeted ;")]
+        public string IncludeFileMask { get; set; }
+
+        [Option('e', "exclude", MetaValue = "Mask", HelpText = "Exclude file masks, delimeted ;")]
+        public string ExcludeFileMask { get; set; }
+
+        [Option("older", MetaValue = "Date", HelpText = "Select files older than")]
+        public DateTime? OlderThan { get; set; }
+
+        [Option("newer", MetaValue = "Date", HelpText = "Select files newer than")]
+        public DateTime? NewerThan { get; set; }
+
         [Option("prefix", MetaValue = "name", HelpText = "Prefix or name of task")]
         public string Prefix { get; set; }
 

@@ -124,7 +124,18 @@ namespace mnBackupLib
             {
                 this.ArhParam.VolumeSize = (int)taskOptions.VolumeSize;
             }
-            
+            // FileFilter
+            if (!String.IsNullOrEmpty(taskOptions.IncludeFileMask)) 
+                this.SourceFilter.IncludeFileMask=taskOptions.IncludeFileMask;
+            if (!String.IsNullOrEmpty(taskOptions.ExcludeFileMask)) 
+                this.SourceFilter.ExcludeFileMask=taskOptions.ExcludeFileMask;
+            if (!String.IsNullOrEmpty(taskOptions.ExcludeFileMask)) 
+                this.SourceFilter.ExcludeFileMask=taskOptions.ExcludeFileMask;
+            if (taskOptions.OlderThan!=null) 
+                this.SourceFilter.OlderThan=(DateTime)taskOptions.OlderThan;
+            if (taskOptions.NewerThan!=null)
+                this.SourceFilter.NewerThan = (DateTime)taskOptions.NewerThan;
+
 
         }
         /// <summary>
