@@ -45,7 +45,7 @@ namespace mnBackupTest
             DateTime lastFull=man.GetLastFullDate();
             Assert.AreEqual(dtFull, lastFull, "Последнее полное копирование");
 
-            Period period=new Period(Period.PeriodName.Day,4);
+            TimePeriod period = new TimePeriod("4d");
             BackupInfo[] toDelete=man.GetAllBeforePeriod(period);
             Assert.AreEqual(3, toDelete.Length, "Заданий на удаление");
 

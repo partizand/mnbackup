@@ -104,20 +104,20 @@ namespace mnBackupLib
             // Interval
             if (taskOptions.Interval == null)
             {
-                this.Plan.Interval = new Period(Config.Instance.mnConfig.Interval);
+                this.Plan.Interval = new TimePeriod(Config.Instance.mnConfig.Interval);
             }
             else
             {
-                this.Plan.Interval = new Period(taskOptions.Interval);
+                this.Plan.Interval = new TimePeriod(taskOptions.Interval);
             }
             // Store
             if (String.IsNullOrEmpty(taskOptions.Store))
             {
-                this.Plan.Store = new Period(Config.Instance.mnConfig.Store);
+                this.Plan.Store = new TimePeriod(Config.Instance.mnConfig.Store);
             }
             else
             {
-                this.Plan.Store = new Period(taskOptions.Store);
+                this.Plan.Store = new TimePeriod(taskOptions.Store);
             }
             // VolumeSize
             if (taskOptions.VolumeSize != null)

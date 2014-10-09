@@ -21,18 +21,18 @@ namespace mnBackupLib
         /// Интервал в днях между полными копиями
         /// </summary>
         [DataMember]
-        public Period Interval { get; set; }
+        public TimePeriod Interval { get; set; }
         /// <summary>
         /// Период между полными бэкапами
         /// </summary>
         [DataMember]
-        public Period Store { get; set; }
+        public TimePeriod Store { get; set; }
 
         public BackupPlan()
         {
             Type = TypeBackup.Full;
-            Interval = new Period(Config.Instance.mnConfig.Interval);
-            Store = new Period(Config.Instance.mnConfig.Store);
+            Interval = new TimePeriod(Config.Instance.mnConfig.Interval);
+            Store = new TimePeriod(Config.Instance.mnConfig.Store);
         }
         
     

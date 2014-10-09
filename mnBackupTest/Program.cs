@@ -11,13 +11,7 @@ namespace mnBackupTest
         static void Main(string[] args)
         {
             // Проверка чтения периода
-            Period per = new Period("2d");
             
-
-            per = new Period("week");
-            
-
-            per = new Period("3Month");
             
         }
     }

@@ -2,63 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.Serialization;
 
 namespace mnBackupLib
 {
-    /// <summary>
-    /// Класс для работы с интервалами 1d, 1w
-    /// </summary>
-    [DataContract]
-    public class Period
+    public class TimePeriod
     {
-        /// <summary>
-        /// Имена периодов (Day, Week, Month, Year)
-        /// </summary>
-        public enum PeriodName {Day, Week, Month }
-
-        #region Properties
-
-        /// <summary>
-        /// Имя периода
-        /// </summary>
-        public PeriodName IntervalName
+        public struct TimeRange
         {
-            get { return intervalName; }
+            public int Days { get; set; }
+            public int Weeks { get; set; }
+            public int Months { get; set; }
+            public int Years { get; set; }
         }
-        [DataMember]
-        PeriodName intervalName;
-
-        /// <summary>
-        /// Значение периода
-        /// </summary>
-        public int IntervalValue
-        {
-            get { return intervalValue; }
-        }
-        [DataMember]
-        int intervalValue;
-
-        public int Days { get; set; }
-        public int Weeks { get; set; }
-        public int Months { get; set; }
-        public int Years { get; set; }
-
-        #endregion
+        public TimeRange Range;
 
         #region Constructors
 
-        public Period(PeriodName IntName, int IntValue)
+        public TimePeriod()
         {
-            intervalName = IntName;
-            intervalValue = IntValue;
+            Range=new TimeRange();
+            Range.Days = 0;
+            Range.Weeks = 0;
+            Range.Months = 0;
+            Range.Years = 0;
         }
+        
+        
 
-        public Period(PeriodName IntName)
+        public TimePeriod(TimeRange range)
         {
-            intervalName = IntName;
-            intervalValue = 1;
+            Range=range;
         }
+        
         
         /// <summary>
         /// Чтение периода из строки
@@ -70,18 +45,35 @@ namespace mnBackupLib
         /// d, day
         /// </summary>
         /// <param name="str"></param>
-        public Period(string str)
+        public TimePeriod(string str)
         {
             
-            ParseI(str, out intervalName, out intervalValue);
+            ParseI(str, out Range);
 
         }
         
         #endregion
 
+        public bool isEmpty()
+        {
+            
+            return Range.Days + Range.Weeks + Range.Months + Range.Years == 0;
+        }
+
         public override string ToString()
         {
-            return intervalValue.ToString() + intervalName.ToString().Substring(0,1);
+            StringBuilder str=new StringBuilder();
+            if (Range.Days > 0)
+                str.AppendFormat("{0}d", Range.Days);
+            if (Range.Weeks > 0)
+                str.AppendFormat("{0}w", Range.Weeks);
+            if (Range.Months > 0)
+                str.AppendFormat("{0}m", Range.Months);
+            if (Range.Years > 0)
+                str.AppendFormat("{0}y", Range.Years);
+            
+            return str.ToString();
+            
         }
         /// <summary>
         /// Чтение периода из строки. Возвращает имя периода и значение
@@ -90,10 +82,11 @@ namespace mnBackupLib
         /// <param name="periodName"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static bool ParseI(string str, out PeriodName periodName,out int value)
+        private static bool ParseI(string str, out TimeRange range)
         {
-            value = 1;
-            periodName = PeriodName.Day;
+            range=new TimeRange();
+            int value=1;
+            bool hasNumbers;
             bool ret = true;
             char[] Numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
             string Str = str.ToLower().Trim();
@@ -105,13 +98,23 @@ namespace mnBackupLib
             if (lastNumIndex > -1) // Цифры есть
             {
                 string strNum = Str.Substring(0, lastNumIndex + 1);
-                ret=int.TryParse(strNum, out value);
+                ret = int.TryParse(strNum, out value);
+                if (!ret) value = 0;
+                hasNumbers = true;
+            }
+            else
+            {
+                hasNumbers = false;
             }
 
 
-            if (Str.EndsWith("d") || Str.EndsWith("day")) periodName = PeriodName.Day;
-            if (Str.EndsWith("w") || Str.EndsWith("week")) periodName = PeriodName.Week;
-            if (Str.EndsWith("m") || Str.EndsWith("month")) periodName = PeriodName.Month;
+
+            if (Str.EndsWith("d") || Str.EndsWith("day")) range.Days = value;
+            else if (Str.EndsWith("w") || Str.EndsWith("week")) range.Weeks = value;
+            else if (Str.EndsWith("m") || Str.EndsWith("month")) range.Months = value;
+            else if (Str.EndsWith("y") || Str.EndsWith("year")) range.Years = value;
+            else if (hasNumbers) range.Days = value;
+            
             return ret;
         }
         /// <summary>
@@ -119,12 +122,11 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static Period Parse(string str)
+        public static TimePeriod Parse(string str)
         {
-            int val;
-            PeriodName per;
-            ParseI(str, out per, out val);
-            Period p = new Period(per, val);
+            TimeRange tr;
+            ParseI(str, out tr);
+            TimePeriod p = new TimePeriod(tr);
             return p;
             
         }
@@ -134,9 +136,9 @@ namespace mnBackupLib
         /// <param name="str"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static bool TryParse(string str,out Period p)
+        public static bool TryParse(string str,out TimePeriod p)
         {
-            p = new Period(PeriodName.Day);
+            p = new TimePeriod();
             try
             {
                 p = Parse(str);
@@ -160,17 +162,17 @@ namespace mnBackupLib
             }
 
             // If parameter cannot be cast to Point return false.
-            Period p = obj as Period;
+            TimePeriod p = obj as TimePeriod;
             if ((System.Object)p == null)
             {
                 return false;
             }
 
             // Return true if the fields match:
-            return (intervalName == p.intervalName) && (intervalValue == p.intervalValue);
+            return (Range.Days == p.Range.Days) && (Range.Weeks == p.Range.Weeks) && (Range.Months == p.Range.Months) && (Range.Years == p.Range.Years);
         }
 
-        public bool Equals(Period p)
+        public bool Equals(TimePeriod p)
         {
             // If parameter is null return false:
             if ((object)p == null)
@@ -179,15 +181,16 @@ namespace mnBackupLib
             }
 
             // Return true if the fields match:
-            return (intervalName == p.intervalName) && (intervalValue == p.intervalValue);
+            return (Range.Days == p.Range.Days) && (Range.Weeks == p.Range.Weeks) && (Range.Months == p.Range.Months) && (Range.Years == p.Range.Years);
         }
 
         public override int GetHashCode()
         {
-            return (int)intervalName^intervalValue;
+            
+            return Range.Days + Range.Weeks * 7 + Range.Months * 30 + Range.Years * 365;
         }
 
-        public static bool operator ==(Period a, Period b)
+        public static bool operator ==(TimePeriod a, TimePeriod b)
         {
             // If both are null, or both are same instance, return true.
             if (System.Object.ReferenceEquals(a, b))
@@ -202,10 +205,10 @@ namespace mnBackupLib
             }
 
             // Return true if the fields match:
-            return a.IntervalName== b.IntervalName && a.IntervalValue == b.IntervalValue;
+            return (a.Range.Days == b.Range.Days) && (a.Range.Weeks == b.Range.Weeks) && (a.Range.Months == b.Range.Months) && (a.Range.Years == b.Range.Years);
         }
 
-        public static bool operator !=(Period a, Period b)
+        public static bool operator !=(TimePeriod a, TimePeriod b)
         {
             return !(a == b);
         }
@@ -263,51 +266,18 @@ namespace mnBackupLib
             if (multiplier < 0) multiplier = -1;
             if (multiplier > 0) multiplier = 1;
             if (multiplier == 0) multiplier = 1;
+
+            dtAdd = dt.AddDays(Range.Days * multiplier);
+            dtAdd = dtAdd.AddDays(Range.Weeks * 7 * multiplier);
+            dtAdd = dtAdd.AddMonths(Range.Months * multiplier);
+            dtAdd = dtAdd.AddYears(Range.Years * multiplier);
+
             
-            switch (intervalName)
-            {
-                case PeriodName.Day:
-                    dtAdd = dt.AddDays(intervalValue * multiplier);
-                    break;
-                case PeriodName.Week:
-                    dtAdd = dt.AddDays(intervalValue * 7 * multiplier);
-                    break;
-                case PeriodName.Month:
-                    dtAdd = dt.AddMonths(intervalValue * multiplier);
-                    break;
-                default:
-                    dtAdd = dt.AddDays(intervalValue * multiplier);
-                    break;
-
-
-            }
             return dtAdd;
         }
 
-        public TimeSpan GetTimeSpan()
-        {
-            TimeSpan ts;
-            // Определяем количество дней
-            int days;
-            switch (intervalName)
-            {
-                case PeriodName.Day:
-                    days = intervalValue;
-                    break;
-                case PeriodName.Week:
-                    days = intervalValue * 7;
-                    break;
-                case PeriodName.Month:
-                    days = dMonths(intervalValue * multiplier);
-                    break;
-                default:
-                    days = intervalValue;
-                    break;
-
-
-            }
-        }
- 
         
+ 
+
     }
 }

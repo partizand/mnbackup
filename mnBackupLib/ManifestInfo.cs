@@ -81,7 +81,7 @@ namespace mnBackupLib
             
         }
 
-        public StatusBackup DeleteOld(Period store)
+        public StatusBackup DeleteOld(TimePeriod store)
         {
             // Какие архивы нужно удалить
             //StatusBackup st = StatusBackup.OK;
@@ -135,9 +135,9 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="FullIntervalSave"></param>
         /// <returns></returns>
-        public BackupInfo[] GetAllBeforePeriod(Period FullIntervalSave)
+        public BackupInfo[] GetAllBeforePeriod(TimePeriod FullIntervalSave)
         {
-            if (FullIntervalSave.IntervalValue == 0) return null;
+            if (FullIntervalSave.isEmpty()) return null;
             DateTime dtBefore = FullIntervalSave.SubFromDate(DateTime.Today);
             // Индекс первого полного копирования которое нужно оставить
             int iLastFullToStay = Lines.FindIndex(obj => obj.BackupDate >= dtBefore && obj.TypeBackup == TypeBackup.Full);

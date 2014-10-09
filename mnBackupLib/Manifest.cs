@@ -104,7 +104,7 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="store"></param>
         /// <returns></returns>
-        public StatusBackup DeleteOld(Period store)
+        public StatusBackup DeleteOld(TimePeriod store)
         {
             int i;
             StatusInfo<StatusBackup> si = new StatusInfo<StatusBackup>(StatusBackup.OK);
@@ -133,7 +133,7 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="FullIntervalSave"></param>
         /// <returns></returns>
-        public BackupInfo[] GetAllBeforePeriod(Period FullIntervalSave)
+        public BackupInfo[] GetAllBeforePeriod(TimePeriod FullIntervalSave)
         {
             return Mans[0].GetAllBeforePeriod(FullIntervalSave);
    

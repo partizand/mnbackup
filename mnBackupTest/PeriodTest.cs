@@ -14,24 +14,30 @@ namespace mnBackupTest
         public void TestPeriod()
         {
             // Проверка чтения периода
-            Period per = new Period(" 2d ");
-            Assert.AreEqual(Period.PeriodName.Day, per.IntervalName, "Имя периода День");
-            Assert.AreEqual(2, per.IntervalValue, "Значение 2");
+            TimePeriod per = new TimePeriod(" 2d ");
+            Assert.AreEqual(2,per.Range.Days,"2 Дня");
 
-            per = new Period("week");
-            Assert.AreEqual(Period.PeriodName.Week, per.IntervalName, "Имя периода");
-            Assert.AreEqual(1, per.IntervalValue, "Значение периода");
+            per = new TimePeriod(" ");
+            Assert.AreEqual(true, per.isEmpty(), "пустой период");
 
-            per = new Period("3Month");
-            Assert.AreEqual(Period.PeriodName.Month, per.IntervalName, "Имя периода");
-            Assert.AreEqual(3, per.IntervalValue, "Значение периода");
+            per = new TimePeriod("vasya");
+            Assert.AreEqual(true, per.isEmpty(), "Неправильная строка");
 
-            per = new Period(Period.PeriodName.Month);
-            Assert.AreEqual(Period.PeriodName.Month, per.IntervalName, "Имя периода");
-            Assert.AreEqual(1, per.IntervalValue, "Значение периода");
+            per = new TimePeriod("15");
+            Assert.AreEqual(15, per.Range.Days, "15 дней");
+
+            per = new TimePeriod("week");
+            Assert.AreEqual(1, per.Range.Weeks, "1 неделя");
+            
+
+            per = new TimePeriod("3Month");
+            Assert.AreEqual(3, per.Range.Months, "3 months");
+            
+
+            
 
             // Прибавить отнять даты
-            per = new Period("3Day");
+            per = new TimePeriod("3Day");
             DateTime dTest=new DateTime(2014,08,20); // Исходная дата
             DateTime dRes=new DateTime(2014,08,23); // Дата должна получится
             DateTime dt = per.AddToDate(dTest); // Вычисляемая дата

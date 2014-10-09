@@ -16,8 +16,8 @@ namespace mnBackupTest
         {
             //Config conf = new Config();
             Assert.AreEqual("L:", Config.Instance.mnConfig.ExposeVolume);
-            Period EtalonPer = new Period("2w");
-            Period per = new Period(Config.Instance.mnConfig.Interval);
+            TimePeriod EtalonPer = new TimePeriod("2w");
+            TimePeriod per = new TimePeriod(Config.Instance.mnConfig.Interval);
             Assert.AreEqual(EtalonPer, per, "Default interval");
 
             Options opt = new Options();

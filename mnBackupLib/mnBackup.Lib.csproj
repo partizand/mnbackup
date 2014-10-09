@@ -102,7 +102,6 @@
     <Compile Include="FileManage.cs" />
     <Compile Include="ManifestInfo.cs" />
     <Compile Include="Options.cs" />
-    <Compile Include="Period.cs" />
     <Compile Include="Manifest.cs" />
     <Compile Include="BackupInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -116,6 +115,7 @@
     <Compile Include="StatusInfo.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimePeriod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
