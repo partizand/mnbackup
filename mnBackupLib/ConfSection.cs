@@ -26,6 +26,8 @@ namespace mnBackupLib
         /// </summary>
         const string DEFAULT_STORE = "1m";
 
+        const string DEFAULT_PREFIX = "_{yyMMdd-HHmmss}_[Type]";
+
         #endregion
 
         #region Constructors
@@ -78,6 +80,14 @@ namespace mnBackupLib
                 ConfigurationPropertyOptions.None
             );
 
+            s_propPrefix = new ConfigurationProperty(
+                "Prefix",
+                typeof(string),
+                null,
+                ConfigurationPropertyOptions.None
+            );
+
+
             s_propString = new ConfigurationProperty(
                 "stringValue",
                 typeof(string),
@@ -105,6 +115,7 @@ namespace mnBackupLib
             s_properties.Add(s_propStore);
             s_properties.Add(s_propTaskFile);
             s_properties.Add(s_propTempDir);
+            s_properties.Add(s_propPrefix);
 
             s_properties.Add(s_propString);
             s_properties.Add(s_propBool);
@@ -127,6 +138,7 @@ namespace mnBackupLib
         private static ConfigurationProperty s_propStore;
         private static ConfigurationProperty s_propTaskFile;
         private static ConfigurationProperty s_propTempDir;
+        private static ConfigurationProperty s_propPrefix;
 
         private static ConfigurationProperty s_propString;
         private static ConfigurationProperty s_propBool;
@@ -182,6 +194,16 @@ namespace mnBackupLib
         {
             get { return (string)base[s_propTempDir]; }
             set { base[s_propTempDir] = value; }
+        }
+
+        /// <summary>
+        /// Временный каталог для создания архивов
+        /// </summary>
+        [ConfigurationProperty("Prefix")]
+        public string Prefix
+        {
+            get { return (string)base[s_propPrefix]; }
+            set { base[s_propPrefix] = value; }
         }
 
         /// <summary>

@@ -109,6 +109,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ReplVar.cs" />
     <Compile Include="SerialIO.cs" />
     <Compile Include="Singleton.cs" />
     <Compile Include="Snapshot.cs" />

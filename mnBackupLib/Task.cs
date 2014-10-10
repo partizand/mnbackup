@@ -166,7 +166,7 @@ namespace mnBackupLib
             //string dest = String.Empty;
             //if (destIndex < Destination.Length) dest = Destination[destIndex];
             //string manifestFile = Path.Combine(dest, "manifest"+GetPrefix()+".json");
-            string manifestFile =  "manifest" + GetPrefix() + ".json";
+            string manifestFile =  "manifest" + NameTask + ".json";
 
             return manifestFile;
         }
@@ -198,12 +198,34 @@ namespace mnBackupLib
         /// <returns></returns>
         public string GetArhName(string type)
         {
-            string pref=GetPrefix();
+            string pref=GetPrefix(type);
             
-            pref = pref + DateTime.Now.ToString("_yyMMdd-HHmmss_") + type + ".7z";// Добавить текущую дату и время
+            
+
+            pref = NameTask + pref  + ".7z";// Добавить текущую дату и время
             //pref = Path.Combine(this.Destination, pref);
             return pref; 
         }
+
+        /// <summary>
+        /// Получить префикс задания раскрытый из переменных
+        /// </summary>
+        /// <returns></returns>
+         string GetPrefix(string type)
+        {
+            string pref;
+
+            if (String.IsNullOrEmpty(Prefix))
+                Prefix = Config.Instance.mnConfig.Prefix;
+
+            pref = ReplVar.ReplDate(Prefix);
+            pref = ReplVar.ReplENV(pref);
+            pref=pref.Replace("[Type]", type);
+
+            return pref;
+        }
+
+
         /// <summary>
         /// Возвращает каталог в который нужно архивировать.
         /// Это либо временный каталог, либо первый каталог из списка Destination
@@ -256,24 +278,7 @@ namespace mnBackupLib
 
         }
 
-        /// <summary>
-        /// Получить префикс задания
-        /// </summary>
-        /// <returns></returns>
-        public string GetPrefix()
-        {
-            string pref;
-            if (!String.IsNullOrEmpty(Prefix))
-            {
-                pref = Prefix;
-            }
-            else
-            {
-                pref = NameTask.Replace(" ", ""); // Убрать пробелы из имени
-            }
-            return pref;
-        }
-
+        
         /// <summary>
         /// Возвращает список файлов для обработки задания в соответсвии с фильтром
         /// </summary>
