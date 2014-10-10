@@ -86,17 +86,29 @@ namespace mnBackupLib
         public Task(TaskSubOptions taskOptions)
         {
             Init();
-
+            // Prefix
             if (!String.IsNullOrEmpty(taskOptions.Prefix))
             {
-                this.NameTask = taskOptions.Prefix;
                 this.Prefix = taskOptions.Prefix;
+            }
+            
+            SetSource(taskOptions.Source);
+            // Name
+            if (!String.IsNullOrEmpty(taskOptions.NameTask))
+            {
+                this.NameTask = taskOptions.NameTask;
             }
             else
             {
-                this.NameTask = "CmdTask";
+                if (this.Source.Length > 0)
+                {
+                    this.NameTask = Path.GetFileName(this.Source[0]); // Имя задания последний каталог первого источника
+                }
+                else
+                {
+                    this.NameTask = "Cmd";
+                }
             }
-            SetSource(taskOptions.Source);
             //this.Source = FileManage.ConvertToArray(taskOptions.Source);
             this.Destination = FileManage.ConvertToArray(taskOptions.Destination);
             this.Shadow = taskOptions.Shadow;

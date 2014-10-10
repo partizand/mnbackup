@@ -104,8 +104,11 @@ namespace mnBackupLib
         [Option("newer", MetaValue = "Date", HelpText = "Select files newer than")]
         public DateTime? NewerThan { get; set; }
 
-        [Option("prefix", MetaValue = "name", HelpText = "Prefix or name of task")]
+        [Option("prefix", MetaValue = "value", HelpText = "Prefix of task")]
         public string Prefix { get; set; }
+        
+        [Option("name", MetaValue = "value", HelpText = "Name of task")]
+        public string NameTask { get; set; }
 
         [Option('t', "type", DefaultValue = TypeBackup.Full, HelpText = "Type backup Full|Differential")]
         public TypeBackup typeBackup { get; set; }
