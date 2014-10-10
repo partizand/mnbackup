@@ -24,7 +24,7 @@ namespace mnBackupLib
         /// <summary>
         /// время хранения полных копий по умолчанию
         /// </summary>
-        const string DEFAULT_STORE = "1m";
+        const string DEFAULT_STORE = "0";
 
         const string DEFAULT_PREFIX = "_{yyMMdd-HHmmss}_[Type]";
 
@@ -83,7 +83,7 @@ namespace mnBackupLib
             s_propPrefix = new ConfigurationProperty(
                 "Prefix",
                 typeof(string),
-                null,
+                DEFAULT_PREFIX,
                 ConfigurationPropertyOptions.None
             );
 
