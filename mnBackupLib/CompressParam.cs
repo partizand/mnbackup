@@ -30,6 +30,9 @@ namespace mnBackupLib
         /// </summary>
         [DataMember]
         public int VolumeSize;
+
+        public string Password;
+        
         /// <summary>
         /// Создает параметры по умолчанию
         /// </summary>

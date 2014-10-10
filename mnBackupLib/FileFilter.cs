@@ -38,12 +38,12 @@ namespace mnBackupLib
         /// Файлы старее чем +==
         /// </summary>
         [DataMember]
-        public DateTime OlderThan;
+        public DateTime? OlderThan;
         /// <summary>
         /// Файлы новее чем ==+
         /// </summary>
         [DataMember]
-        public DateTime NewerThan;
+        public DateTime? NewerThan;
 
         /// <summary>
         /// Используемые атрибуты. 0-все. Или FileAttributes.Archive|FileAttributes.Hidden
@@ -63,8 +63,8 @@ namespace mnBackupLib
         {
             IncludeFileMask = "*";
             ExcludeFileMask = "";
-            OlderThan=DateTime.MaxValue;
-            NewerThan = DateTime.MinValue;
+            OlderThan = null;// DateTime.MaxValue;//new DateTime(2015, 01, 01); //DateTime.MaxValue;
+            NewerThan = null;// DateTime.MinValue;//new DateTime(2011, 01, 01);//DateTime.MinValue;
             UsedAttributes = 0;
             
         }
@@ -73,8 +73,8 @@ namespace mnBackupLib
         {
             IncludeFileMask = IncFileMask;
             ExcludeFileMask = ExcFileMask;
-            OlderThan = DateTime.MaxValue;
-            NewerThan = DateTime.MinValue;
+            OlderThan = null;// DateTime.MaxValue;
+            NewerThan = null;// DateTime.MinValue;
             UsedAttributes = 0;
         }
         
@@ -116,8 +116,18 @@ namespace mnBackupLib
         private bool checkDate(string FileName)
         {
             // Нет фильтра на дату
-            if (OlderThan == DateTime.MinValue && NewerThan == DateTime.MaxValue) return true;
+            //if (OlderThan == DateTime.MinValue && NewerThan == DateTime.MaxValue) return true;
+            if (OlderThan == null && NewerThan == null) return true;
             DateTime fDate = System.IO.File.GetLastWriteTime(FileName);
+            if (OlderThan == null && NewerThan!=null)
+            {
+                if (fDate >= NewerThan) return true;
+            }
+            if (OlderThan != null && NewerThan == null)
+            {
+                if (fDate <= OlderThan) return true;
+            }
+
             if (fDate >= NewerThan && fDate <= OlderThan) return true;
             else return false;
 

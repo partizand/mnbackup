@@ -19,6 +19,7 @@ namespace mnBackupLib
             // Since we create this instance the parser will not overwrite it
             TaskOpt = new TaskSubOptions();// { Patch = true };
             RunOpt = new RunSubOptions();
+            SaveOpt = new SaveSubOptions();
         }
 
         
@@ -29,11 +30,8 @@ namespace mnBackupLib
         [VerbOption("run", HelpText = "Run tasks from file.")]
         public RunSubOptions RunOpt { get; set; }
 
-        
-
-        
-
-                   
+        [VerbOption("save", HelpText = "Save task to file")]
+        public SaveSubOptions SaveOpt { get; set; }
 
             //
             // Marking a property of type IParserState with ParserStateAttribute allows you to
@@ -62,22 +60,31 @@ namespace mnBackupLib
     /// </summary>
     abstract public class CommonSubOptions
     {
-        [Option('e', "ExposeVolume", MetaValue = "DriveLetter", HelpText = "Volume letter to mount snapshot of shadow copy")]
+        [Option("ExposeVolume", MetaValue = "DriveLetter", HelpText = "Volume letter to mount snapshot of shadow copy")]
         public string ExposeVolume { get; set; }
 
         [Option("TempDir", HelpText = "Temp dir for create archives")]
         public string TempDir { get; set; }
         
+        /*
         [Option("MailHost", HelpText = "Mail server name for send reports")]
         public string MailHost { get; set; }
 
         [Option("MailAddr", HelpText = "Email to send reports")]
         public string MailAddr { get; set; }
+         */ 
     }
+
+    public class SaveSubOptions : TaskSubOptions
+    {
+        [Option('f', "file", MetaValue = "FILE", Required = true, HelpText = "Filename to save task")]
+        public string TaskFile { get; set; }
+    }
+
     /// <summary>
     /// Параметры командной строки для описания задачи из командной строки
     /// </summary>
-    public sealed class TaskSubOptions:CommonSubOptions
+    public class TaskSubOptions:CommonSubOptions
     {
         [Option('s', "source", MetaValue = "Dir", Required = true, HelpText = "Source dirs delimeted ;")]
         public string Source { get; set; }
@@ -114,6 +121,9 @@ namespace mnBackupLib
 
         [Option("shadow",  HelpText = "Use volume shadow copying.")]
         public bool Shadow { get; set; }
+
+        [Option('p',"pass", MetaValue = "password", HelpText = "Set password on archive")]
+        public string Password { get; set; }
 
         
     }

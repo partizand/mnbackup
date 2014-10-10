@@ -38,14 +38,24 @@ namespace mnBackupLib
             cmp.CompressionLevel = Param.Level;
             cmp.CompressionMethod = Param.Method;
             cmp.VolumeSize = Param.VolumeSize;
+            //cmp.Password = Param.Password;
+
+            
 
             cmp.FileCompressionStarted += new EventHandler<FileNameEventArgs>(cmp_FileCompressionStarted);
             //cmp.CompressionFinished += new EventHandler<EventArgs>(cmp_CompressionFinished);
 
             try
             {
-                cmp.CompressFiles(ArhFileName, files);
-                //cmp.CompressDirectory(@"d:\Temp\mnBackupTest\source", @"d:\Temp\mnBackupTest\dest\voltest.7z");
+                if (String.IsNullOrEmpty(Param.Password))
+                {
+                    cmp.CompressFiles(ArhFileName, files);
+                }
+                else
+                {
+                    cmp.CompressFilesEncrypted(ArhFileName, Param.Password, files);
+                }
+                
                 return true;
             }
             

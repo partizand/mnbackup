@@ -124,6 +124,11 @@ namespace mnBackupLib
             {
                 this.ArhParam.VolumeSize = (int)taskOptions.VolumeSize;
             }
+            // Password
+            if (!String.IsNullOrEmpty(taskOptions.Password))
+            {
+                this.ArhParam.Password = taskOptions.Password;
+            }
             // FileFilter
             if (!String.IsNullOrEmpty(taskOptions.IncludeFileMask)) 
                 this.SourceFilter.IncludeFileMask=taskOptions.IncludeFileMask;

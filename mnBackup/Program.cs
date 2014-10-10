@@ -33,7 +33,7 @@ namespace mnBackup
 
             
 
-            Parser parser = new CommandLine.Parser  ( with => with.HelpWriter = Console.Error);
+            Parser parser = new CommandLine.Parser  ( with => with.HelpWriter = Console.Out);
 
 
             string invokedVerb="";
@@ -81,6 +81,14 @@ namespace mnBackup
                 Config.Instance.MergeOptions(commitSubOptions);
                 bak.Read();
                 bak.Start();
+            }
+            if (invokedVerb == "save") // запуск заданий из файла
+            {
+                var SaveSubOptions = (SaveSubOptions)invokedVerbInstance;
+
+                Task job = new Task(SaveSubOptions);
+                bak.Add(job);
+                bak.Save(SaveSubOptions.TaskFile);
             }
             
             
