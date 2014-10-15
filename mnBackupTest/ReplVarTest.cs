@@ -10,7 +10,7 @@ namespace mnBackupTest
     class ReplVarTest
     {
         [Test]
-        public void ReplDateTest()
+        public void ExpandVarsTest()
         {
             // Дата
             string str = "Date=${yyyy-MM-dd}";
@@ -19,15 +19,24 @@ namespace mnBackupTest
             Assert.AreEqual("Date=2014-10-15", newStr,"date test");
             
             // Переменные среды
-            str = "Temp=%Temp% CompName=%ComputerName%";
-            string CompName = System.Environment.MachineName;
-            string TestParamName = "Temp";
+            string TestEnvName = "Temp";
+            str = String.Format("{0}=%{0}%",TestEnvName);
+            
+            
             string TestParamValue;
-            TestParamValue = System.Environment.GetEnvironmentVariable(TestParamName);
+            TestParamValue = System.Environment.GetEnvironmentVariable(TestEnvName);
 
-            string Etalon = String.Format("Temp={0} CompName={1}", TestParamValue, CompName);
+            string Etalon = String.Format("{0}={1}", TestEnvName,TestParamValue);
             newStr = mnBackupLib.ReplVar.ExpandVars(str);
             Assert.AreEqual(Etalon, newStr,"Enviroment test");
+
+            // Имя компьютера
+            string CompName = System.Environment.MachineName;
+            str = "CompName=${ComputerName}";
+            newStr = ReplVar.ExpandVars(str);
+            Etalon = String.Format("CompName={0}",CompName);
+            Assert.AreEqual(Etalon, newStr, "Enviroment test");
+
 
             // Пользовательские переменные
             Dictionary<string, string> opt = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);

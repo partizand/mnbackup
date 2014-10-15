@@ -265,9 +265,10 @@ namespace mnBackupLib
                 end = S.IndexOf(EndFrame, beg + 1);
                 if (end == -1) break;
 
-                var = S.Substring(beg + BegFrame.Length, end - beg - EndFrame.Length);
+                var = S.Substring(beg + BegFrame.Length, end - beg - EndFrame.Length-1);
                 if (!vars.Contains(var,StringComparer.InvariantCultureIgnoreCase))
                     vars.Add(var);
+                beg = S.IndexOf(BegFrame,end);
                 
             }
             return vars.ToArray();

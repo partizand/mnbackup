@@ -21,6 +21,8 @@ namespace mnBackup
             
 
             // Тест
+            
+
             //Task job = new Task("test","d:\\temp\\testmn\\source","d:\\temp\\testmn\\dest");
             //job.SourceFilter.IncludeFileMask = "*";
 

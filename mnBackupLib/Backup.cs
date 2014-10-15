@@ -177,9 +177,9 @@ namespace mnBackupLib
                 logger.Info("Shadow copy using");
                 try
                 {
-                    if (job.SourceVolumes.Length != 1) // в источниках больше одного тома, теневое копирование на это не рассчитано
+                    if (!job.isSourceVSS()) // для источников нельзя использовать теневое копирование
                     {
-                        logger.Error("Too many volumes to shadow, use only one (or noo volumes, check source)");
+                        logger.Error("Source can not to be snapshoted. Check: 1. Too many volumes to shadow, use only one 2. Non fixed disk, use only local");
                         return StatusBackup.Fatal;
                     }
                     string freeLetter = FileManage.Volumes.GetFreeLetter(Config.Instance.mnConfig.ExposeVolume);
@@ -188,7 +188,7 @@ namespace mnBackupLib
                         logger.Error("No free letter to map snapshot");
                         return StatusBackup.Fatal;
                     }
-                    using (Snapshot vss = new Snapshot(job.SourceVolumes[0], freeLetter))
+                    using (Snapshot vss = new Snapshot(job.Source[0], freeLetter))
                     {
                         //logger.Info("Creating shadow copy");
                         //vss.Setup(Path.GetPathRoot(job.Source),"L:");
@@ -268,6 +268,8 @@ namespace mnBackupLib
             return si.Status;
             
         }
+
+        
         /// <summary>
         /// Проверка существования каталогов источника (isDestination-false) или приемника (isDestination-true)
         /// Попытка создания не существующих, запись в лог

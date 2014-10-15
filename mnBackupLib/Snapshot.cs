@@ -56,12 +56,14 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="Volume">Для какого диска создается образ. Нужен слэш. Например c:\</param>
         /// <param name="mountDriveLetter">На какой диск монтируется образ</param>
-        public Snapshot(string Volume,string mountDriveLetter)
+        public Snapshot(string volume,string mountDriveLetter)
         {
-            _Volume = Volume;
+            _Volume = volume;
             _MountDriveLetter = mountDriveLetter;
             
         }
+        
+
         /// <summary>
         /// Создать снапшот
         /// </summary>

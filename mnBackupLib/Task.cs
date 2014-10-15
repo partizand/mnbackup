@@ -52,8 +52,8 @@ namespace mnBackupLib
         /// <summary>
         /// Список дисков источников (для теневого копирования)
         /// </summary>
-        public string[] SourceVolumes { get { return _SourceVolumes; } }
-        private string[] _SourceVolumes;
+        //public string[] SourceVolumes { get { return _SourceVolumes; } }
+        //private string[] _SourceVolumes;
         /// <summary>
         /// Каталог приемник
         /// </summary>
@@ -189,7 +189,7 @@ namespace mnBackupLib
         private void SetSource(string sources)
         {
             this.Source = FileManage.ConvertToArray(sources);
-            _SourceVolumes = GetSourceVolumes();
+            //_SourceVolumes = GetSourceVolumes();
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace mnBackupLib
         private void SetSource(string[] sources)
         {
             this.Source = sources;
-            _SourceVolumes = GetSourceVolumes();
+            //_SourceVolumes = GetSourceVolumes();
         }
 
         
@@ -319,11 +319,42 @@ namespace mnBackupLib
             return files.ToArray();
 
         }
+        /// <summary>
+        /// Для источников можно использовать теневое копирование
+        /// проверяется что идет использование одного диска и он fixed
+        /// </summary>
+        /// <returns></returns>
+        public bool isSourceVSS()
+        {
+
+            
+
+            if (Source.Length < 0) return false;
+            string volume = Path.GetPathRoot(Source[0]).ToUpper();
+            string volume2;
+            int i;
+            for (i = 1; i < Source.Length; i++)
+            {
+                volume2 = Path.GetPathRoot(Source[i]).ToUpper();
+                if (volume2.CompareTo(volume) == 0)
+                {
+                    return false;
+                }
+            }
+            DriveInfo drive = new DriveInfo(volume);
+            if (drive.DriveType == DriveType.Fixed) // Fixed disk
+                return true;
+            else
+                return false;
+
+            
+        }
 
         /// <summary>
         /// Возвращает список дисков в каталогах источниках
         /// </summary>
         /// <returns></returns>
+        /*
         private string[] GetSourceVolumes()
         {
             string volume;
@@ -338,7 +369,7 @@ namespace mnBackupLib
             }
             return lst.ToArray();
         }
-
+        */
       
     }
     
