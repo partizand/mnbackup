@@ -229,10 +229,11 @@ namespace mnBackupLib
 
             if (String.IsNullOrEmpty(Prefix))
                 Prefix = Config.Instance.mnConfig.Prefix;
+            Dictionary<string, string> opt = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            opt.Add("Type", type);
+            pref = ReplVar.ExpandVars(Prefix,opt);
+            
 
-            pref = ReplVar.ReplDate(Prefix);
-            pref = ReplVar.ReplENV(pref);
-            pref=pref.Replace("[Type]", type);
 
             return pref;
         }

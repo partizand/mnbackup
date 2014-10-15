@@ -737,33 +737,46 @@ asciidoc.install(2);
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p>Утилита бэкапа на .net. Без клиент-серверной технологии для небольших бэкапов</p></div>
+<div class="paragraph"><p>Альфа версия, не тестировалась!!!</p></div>
+<div class="paragraph"><p>Распространяется по лицензии <a href="http://www.gnu.org/licenses/gpl-3.0.html">GNU GPL 3</a></p></div>
+<div class="paragraph"><p><span class="red">ВАЖНО!!! ВЫ ИСПОЛЬЗУЕТЕ ДАННЫЙ ПРОГРАММНЫЙ ПРОДУКТ НА СВОЙ СТРАХ И РИСК!!!</span></p></div>
+<div class="paragraph"><p><strong>Автор заранее слагает с себя ответственность за весь возможный ущерб, причиненный программой.</strong></p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_featrues">Featrues</h2>
+<h2 id="_описание_работы">Описание работы</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>Программа предназначена для бэкапа с небольшого количества компьютеров. Т.к. на больше лучше использовать клиент-серверные технологии.
+Архивирует в 7zip, возможно разбиение на тома в случае большого количества данных. Возможно указание пароля на архивы (пароль хранится в открытом виде).
+Возможно разностное копирование и удаление архивов старше заданого интервала.
+Задачи можно описывать через командную строку или через файл формата json. Графический интерфейс отсутствует.
+Встроенного планировщика нет, подразумевается использование стороннего.</p></div>
+<div class="sect2">
+<h3 id="_теневое_копирование">Теневое копирование</h3>
+<div class="paragraph"><p>Возможно использование теневого копирования для бэкапа открытых файлов. Для теневого копирования необходимы права администратора и запуск на том копьютере, где находится копируемый диск (теневое копирование по сети не работает). В случае использования теневого копирования, в каталогах источниках можно указывать только один диск. Т.к. копия будет создана только для одного диска.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_временный_каталог">Временный каталог</h3>
+<div class="paragraph"><p>Можно указывать несколько каталогов приемников архивов, для большей сохранности копий. Если каталогов несколько, используется архивация во временный каталог, затем копирование архивов по каталогам назначения.
+Общий принцип использования временного каталога:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Без клиент-серверной технологии
+если временный каталог (TempDir) не задан в настройках или через командную строку, то архивация идет в первый каталог приемника, далее оттуда архивы копируются в остальные приемники (если они есть)
 </p>
 </li>
 <li>
 <p>
-Теневое копирование
+если первый каталог приемника находится на локальном фиксированном диске, то архивация идет сразу в первый каталог приемника, а оттуда копируется далее. Не важно, задан ли в этом случае архивный каталог или нет.
 </p>
 </li>
 <li>
 <p>
-Ротация архивов
-</p>
-</li>
-<li>
-<p>
-Архивация 7zip, многотомные архивы, пароль на архивы
+если каталог применика сетевой, съемный и т.п. и архивный каталог задан, то архивация идет сначала в архивный кататалог, а потом уже копируется в приемник (даже если он один)
 </p>
 </li>
 </ul></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -827,11 +840,17 @@ Prefix
 </dt>
 <dd>
 <p>
-        Префикс добавляющийся к имени задания в имени архива. Можно использовать подстановочные переменные: дата/время, переменные среды, имя компьютера/пользователя.
+        Префикс по умолчанию, добавляющийся к имени задания в имени архива. Можно использовать подстановочные переменные: дата/время, переменные среды, имя компьютера/пользователя.
         Итоговое имя архива: Имя задания + префикс.
 </p>
 </dd>
 </dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_логи">Логи</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Используется NLog. Настройки логов можно поменять в NLog.config согласно <a href="https://github.com/nlog/nlog/wiki">документации</a>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -865,7 +884,7 @@ save
 </dd>
 </dl></div>
 <div class="sect2">
-<h3 id="_параметры_задачи">Параметры задачи</h3>
+<h3 id="_параметры_задачи_task">Параметры задачи (task)</h3>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 s, source
@@ -984,6 +1003,55 @@ newer
 </p>
 </dd>
 </dl></div>
+<div class="paragraph"><p>Примеры</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>mnbackup task -s d:\temp -d d:\arh</pre>
+</div></div>
+<div class="paragraph"><p>Архивация каталога temp в arh. Полная копия, архивы хранятся постоянно, если не сменили настройки.</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>mnbackup task -s d:\temp -d d:\arh --shadow</pre>
+</div></div>
+<div class="paragraph"><p>Архивация каталога temp в arh используя теневое копирование</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>mnbackup task -s d:\temp -d d:\arh -t Differential --interval week --store 3m</pre>
+</div></div>
+<div class="paragraph"><p>Архивация каталога temp в arh. Полная копия создается раз в неделю, полные копии хранятся 3 месяца, после чего удаляются.</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>mnbackup task -s c:\Users;c:\Data -d \\server1\store;\\server2\store --TempDir d:\temp --shadow</pre>
+</div></div>
+<div class="paragraph"><p>Архивация каталогов Users и Data на сервера server1 и server2 используя временный каталог d:\temp и теневое копирование.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_параметры_запуска_run">Параметры запуска (run)</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+f, file
+</dt>
+<dd>
+<p>
+        Имя файла с задачами. Если не укзан, берется из настроек. По умолчанию  "mnBackup.json".
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_параметры_сохранения_save">Параметры сохранения (save)</h3>
+<div class="paragraph"><p>Позволяет сохранить задачу описанную в командной строке в файл. К описанию задачи добавьте имя файла в который вы хотите сохранить задачу.
+Например</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>mnbackup save -f Users.json -s c:\Users -d \\server1\store;\\server2\store --shadow</pre>
+</div></div>
+<div class="paragraph"><p>Записать задачу в файл Users.json.</p></div>
+<div class="paragraph"><p>Далее можно запускать</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>mnbackup run -f Users.json --TempDir d:\temp</pre>
+</div></div>
 </div>
 <div class="sect2">
 <h3 id="_общие_параметры">Общие параметры</h3>
@@ -1011,32 +1079,32 @@ TempDir
 </div>
 </div>
 <div class="sect1">
-<h2 id="_зависит_от_проектов">Зависит от проектов</h2>
+<h2 id="_используются_проекты">Используются проекты</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
 <li>
 <p>
-Nlog - Логи
+<a href="http://nlog-project.org/">Nlog</a> - Логи
 </p>
 </li>
 <li>
 <p>
-libcmdline - Разбор командной строки
+<a href="https://commandline.codeplex.com/">libcmdline</a> - Разбор командной строки
 </p>
 </li>
 <li>
 <p>
-AlphaVSS - Теневое копирования
+<a href="http://alphavss.codeplex.com/">AlphaVSS</a> - Теневое копирования
 </p>
 </li>
 <li>
 <p>
-SevenZipSharp - архивация 7zip
+<a href="http://sevenzipsharp.codeplex.com/">SevenZipSharp</a> - архивация 7zip
 </p>
 </li>
 <li>
 <p>
-NUnit - Тесты
+<a href="http://www.nunit.org/">NUnit</a> - Тесты
 </p>
 </li>
 </ul></div>
