@@ -23,9 +23,36 @@ namespace mnBackupLib
         /// <returns></returns>
         public static string ExpandVars(string S,DateTime replDate, Dictionary<string, string> options)
         {
-            string NewS=ReplOptions(S,options);
-            NewS = ReplDate(S,replDate);
-            return NewS;
+            //string NewS=ReplOptions(S,options);
+            //NewS = ReplDate(S,replDate);
+
+            //string param, newS;
+
+            if (options == null)
+            {
+                options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase); // Регистр не важен
+            }
+            options.Add("ComputerName", System.Environment.MachineName);
+            options.Add("MachineName", System.Environment.MachineName);
+            options.Add("UserName", System.Environment.UserName);
+            
+            string[] vars=GetStrVars(S);
+            string newS = newS = System.Environment.ExpandEnvironmentVariables(S);
+            string strDate;
+            foreach (string key in vars)
+            {
+                if (options.ContainsKey(key)) // Переменная
+                {
+                    newS = ReplaceParam(newS, key, options[key]);
+                }
+                else // дата время
+                {
+                    strDate = replDate.ToString(key);
+                    //newS =  newS.Replace("%" + param + "%", strDate);
+                    newS = ReplaceParam(newS, key, strDate);
+                }
+            }
+            return newS;
         }
         /// <summary>
         /// Раскрывает переменные ${ } в строке
@@ -69,16 +96,19 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="S"></param>
         /// <returns></returns>
+        /*
         static string ReplDate(string S)
         {
             return ReplDate(S, DateTime.Now);
         }
+         */ 
         /// <summary>
         /// Заменяет параметры даты (типа ${yyMMdd}) на заданную дату в строке S
         /// </summary>
         /// <param name="S"></param>
         /// <param name="replDate"></param>
         /// <returns></returns>
+        /*
         static string ReplDate(string S, DateTime replDate)
         {
             string param, newS, strDate;
@@ -96,7 +126,7 @@ namespace mnBackupLib
             }
             return newS;
         }
-
+        */
         
 
         /// <summary>
@@ -107,6 +137,7 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="S"></param>
         /// <returns></returns>
+        /*
         static string ReplOptions(string S,Dictionary<string,string> Options)
         {
             string param, newS;
@@ -134,7 +165,7 @@ namespace mnBackupLib
             newS = System.Environment.ExpandEnvironmentVariables(newS);
             return newS;
         }
-
+        */
         /// <summary>
         /// Подстановка занчения параметра в строку. Имя параметра должно быть облачено в разделитель
         /// </summary>
@@ -191,6 +222,7 @@ namespace mnBackupLib
         /// </summary>
         /// <param name="S"></param>
         /// <returns></returns>
+        /*
         static string GetStrVar(string S)
         {
             int beg = 0, end;
@@ -211,6 +243,36 @@ namespace mnBackupLib
             }
             return String.Empty;
         }
+         */
+        /// <summary>
+        /// Возвращает массив переменных строки без обрамляющих символов
+        /// </summary>
+        /// <param name="S"></param>
+        /// <returns></returns>
+        static string[] GetStrVars(string S)
+        {
+            int beg = 0, end;
+            List<string> vars = new List<string>();
+            string var;
+            //string BegFrame = "${";
+            //string EndFrame = "}";
+            beg = S.IndexOf(BegFrame);
+
+            while (beg < S.Length && beg > -1)
+            //if (beg < S.Length && beg > -1)
+            {
+                
+                end = S.IndexOf(EndFrame, beg + 1);
+                if (end == -1) break;
+
+                var = S.Substring(beg + BegFrame.Length, end - beg - EndFrame.Length);
+                if (!vars.Contains(var,StringComparer.InvariantCultureIgnoreCase))
+                    vars.Add(var);
+                
+            }
+            return vars.ToArray();
+        }
+
         /// <summary>
         /// Подстановка занчения параметра в строку. Параметр без скобок
         /// </summary>
