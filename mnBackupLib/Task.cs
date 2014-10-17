@@ -79,7 +79,7 @@ namespace mnBackupLib
         {
             //Enabled = true;
             NameTask = nameTask;
-            SetSource(source);
+            this.Source = FileManage.ConvertToArray(source);// SetSource(source);
             this.Destination = FileManage.ConvertToArray(destination);
             Init();
         }
@@ -91,8 +91,9 @@ namespace mnBackupLib
             {
                 this.Prefix = taskOptions.Prefix;
             }
-            
-            SetSource(taskOptions.Source);
+
+            this.Source = FileManage.ConvertToArray(taskOptions.Source);
+            //SetSource(taskOptions.Source);
             // Name
             if (!String.IsNullOrEmpty(taskOptions.NameTask))
             {
@@ -186,22 +187,24 @@ namespace mnBackupLib
         /// Задает источник для копирования из каталогов разделенных ;
         /// </summary>
         /// <param name="sources">Список каталогов источника разделенных ;</param>
+        /*
         private void SetSource(string sources)
         {
             this.Source = FileManage.ConvertToArray(sources);
             //_SourceVolumes = GetSourceVolumes();
         }
-
+        */
         /// <summary>
         /// Задает источник для копирования из каталогов разделенных ;
         /// </summary>
         /// <param name="sources">Список каталогов источника разделенных ;</param>
+        /*
         private void SetSource(string[] sources)
         {
             this.Source = sources;
             //_SourceVolumes = GetSourceVolumes();
         }
-
+        */
         
         /// <summary>
         /// Получить имя архива, без пути
