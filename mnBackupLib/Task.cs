@@ -16,6 +16,7 @@ namespace mnBackupLib
     {
         //public enum Action {Copy,Arh };
 
+        private DateTime Timestamp;
 
         /// <summary>
         /// Имя задания
@@ -57,8 +58,14 @@ namespace mnBackupLib
         /// <summary>
         /// Каталог приемник
         /// </summary>
-        [DataMember]
-        public string[] Destination { get; set; }
+        
+        
+
+        public string[] Destination { get { return _Destination; } set { _Destination = value; } }
+
+
+        [DataMember(Name = "Destination")]
+        private string[] _Destination;
 
         /// <summary>
         /// План бэкапа (полный, разностный, сколько копий хранить и т.д.)

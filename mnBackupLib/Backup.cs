@@ -124,8 +124,8 @@ namespace mnBackupLib
 
             StatusBackup status;
 
-            //StatusInfo<bool> si2 = new StatusInfo<bool>(true);
             
+
             // Проверка существования каталогов
             status = CheckDir(job.Source, false); // Источников
             si.UpdateStatus(status);
